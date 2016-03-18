@@ -18,8 +18,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+//import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
+import org.apache.commons.math.analysis.polynomials.PolynomialSplineFunction;
 import uk.ac.leeds.ccg.andyt.generic.data.Generic_XYNumericalData;
 import uk.ac.leeds.ccg.andyt.generic.io.Generic_StaticIO;
+import uk.ac.leeds.ccg.andyt.generic.math.Generic_BigDecimal;
 import uk.ac.leeds.ccg.andyt.generic.visualisation.charts.Generic_ScatterPlot;
 
 /**
@@ -47,10 +50,18 @@ public class SlopeAreaAnalysis {
         int counter = 0;
         int minNumberOfDataPoints = 10;
 
+        File projectDir;
+        //projectDir = new File("/scratch02/JonathanCarrivick/SlopeArea/");
+        projectDir = new File("C:\\Users\\geoagdt\\projects\\JonathanCarrivick");
+
         File dirIn;
-        dirIn = new File("/scratch02/JonathanCarrivick/SlopeArea/input");
+        dirIn = new File(
+                projectDir,
+                "input");
         File dirOut;
-        dirOut = new File("/scratch02/JonathanCarrivick/SlopeArea/output");
+        dirOut = new File(
+                projectDir,
+                "output");
         File fileIn;
         fileIn = new File(
                 dirIn,
@@ -59,8 +70,8 @@ public class SlopeAreaAnalysis {
         TreeMap<Integer, Object[]> allData = readData(fileIn);
         PrintDataSummary(allData);
 
-        int dataWidth = 400;//250;
-        int dataHeight = 657;
+        int dataWidth = 500;//400;//250;
+        int dataHeight = 500;//657;
         String xAxisLabel = "Slope";
         String yAxisLabel = "Upstream accumulation area";
         boolean drawOriginLinesOnPlot = true;
@@ -172,7 +183,17 @@ public class SlopeAreaAnalysis {
                             //pointID = Integer.valueOf(fields[4]);
                             flowacc = new BigDecimal(fields[0]);
                             area = new BigDecimal(fields[1]);
+                            if (area.compareTo(BigDecimal.ZERO) == 1) {
+                                area = Generic_BigDecimal.log(10, area, 10, RoundingMode.HALF_UP);
+                            } else {
+                                area = BigDecimal.ZERO;
+                            }
                             slope = new BigDecimal(fields[2]);
+                            if (slope.compareTo(BigDecimal.ZERO) == 1) {
+                                slope = Generic_BigDecimal.log(10, slope, 10, RoundingMode.HALF_UP);
+                            } else {
+                                slope = BigDecimal.ZERO;
+                            }
                             Generic_XYNumericalData point;
                             point = new Generic_XYNumericalData(
                                     slope,

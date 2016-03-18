@@ -13,6 +13,8 @@ import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import uk.ac.leeds.ccg.andyt.generic.data.Generic_XYNumericalData;
 import uk.ac.leeds.ccg.andyt.generic.visualisation.charts.Generic_ScatterPlot;
+import org.apache.commons.math3.fitting.PolynomialCurveFitter;
+//import org.apache.commons.math3.fitting.PolynomialCurveFitter
 
 /**
  *
