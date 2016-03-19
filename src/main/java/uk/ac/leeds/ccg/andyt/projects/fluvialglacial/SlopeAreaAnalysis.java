@@ -46,9 +46,7 @@ public class SlopeAreaAnalysis {
 
     public void run() {
 
-        int n = 1000;//5;
-        int counter = 0;
-        int minNumberOfDataPoints = 10;
+        int minNumberOfDataPoints = 15;
 
         File projectDir;
         //projectDir = new File("/scratch02/JonathanCarrivick/SlopeArea/");
@@ -70,11 +68,18 @@ public class SlopeAreaAnalysis {
         TreeMap<Integer, Object[]> allData = readData(fileIn);
         PrintDataSummary(allData);
 
+        int n;
+        //n = 1000;//5;
+        n = allData.size();
+        int counter = 0;
+
         int dataWidth = 500;//400;//250;
         int dataHeight = 500;//657;
         String xAxisLabel = "Slope";
         String yAxisLabel = "Upstream accumulation area";
-        boolean drawOriginLinesOnPlot = true;
+        boolean drawOriginLinesOnPlot;
+//        drawOriginLinesOnPlot = true;
+        drawOriginLinesOnPlot = false;
         int decimalPlacePrecisionForCalculations = 10;
         int decimalPlacePrecisionForDisplay = 3;
         RoundingMode aRoundingMode = RoundingMode.HALF_UP;
@@ -91,33 +96,35 @@ public class SlopeAreaAnalysis {
         Object[] data;
         while (ite.hasNext()) {
             ID = ite.next();
-            title = "GlacierID = " + ID;
-            fileOut = new File(
-                    dirOut,
-                    "SlopeUAAScatterPlot" + ID + ".PNG");
-            data = allData.get(ID);
-            ArrayList<Generic_XYNumericalData> theGeneric_XYNumericalData;
-            theGeneric_XYNumericalData = (ArrayList<Generic_XYNumericalData>) data[0];
-            if (theGeneric_XYNumericalData.size() > minNumberOfDataPoints) {
+            if (ID == 388) {
                 if (counter < n) {
-                    plot = new SlopeAreaScatterPlot(
-                            data,
-                            executorService,
-                            fileOut,
-                            format,
-                            title,
-                            dataWidth,
-                            dataHeight,
-                            xAxisLabel,
-                            yAxisLabel,
-                            drawOriginLinesOnPlot,
-                            decimalPlacePrecisionForCalculations,
-                            decimalPlacePrecisionForDisplay,
-                            aRoundingMode);
-                    //plot.setData(plot.getDefaultData());
-                    //plot.setStartAgeOfEndYearInterval(0); // To avoid null pointer
-                    plot.run();
-                    counter++;
+                    title = "GlacierID = " + ID;
+                    fileOut = new File(
+                            dirOut,
+                            "SlopeUAAScatterPlot" + ID + ".PNG");
+                    data = allData.get(ID);
+                    ArrayList<Generic_XYNumericalData> theGeneric_XYNumericalData;
+                    theGeneric_XYNumericalData = (ArrayList<Generic_XYNumericalData>) data[0];
+                    if (theGeneric_XYNumericalData.size() > minNumberOfDataPoints) {
+                        plot = new SlopeAreaScatterPlot(
+                                data,
+                                executorService,
+                                fileOut,
+                                format,
+                                title,
+                                dataWidth,
+                                dataHeight,
+                                xAxisLabel,
+                                yAxisLabel,
+                                drawOriginLinesOnPlot,
+                                decimalPlacePrecisionForCalculations,
+                                decimalPlacePrecisionForDisplay,
+                                aRoundingMode);
+                        //plot.setData(plot.getDefaultData());
+                        //plot.setStartAgeOfEndYearInterval(0); // To avoid null pointer
+                        plot.run();
+                        counter++;
+                    }
                 }
             }
         }
