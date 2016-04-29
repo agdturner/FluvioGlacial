@@ -7,7 +7,9 @@ package uk.ac.leeds.ccg.andyt.projects.fluvialglacial;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.StreamTokenizer;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -46,7 +48,7 @@ public class SlopeAreaAnalysis {
 
     public void run() {
 
-        int minNumberOfDataPoints = 15;
+        int minNumberOfDataPoints = 10;
 
         File projectDir;
         //projectDir = new File("/scratch02/JonathanCarrivick/SlopeArea/");
@@ -60,23 +62,70 @@ public class SlopeAreaAnalysis {
         dirOut = new File(
                 projectDir,
                 "output");
-        File fileIn;
-        fileIn = new File(
+        File austriaDirOut;
+        austriaDirOut = new File(
+                dirOut,
+                "austria");
+        File swissDirOut;
+        swissDirOut = new File(
+                dirOut,
+                "swiss");
+
+        File swissFileIn;
+        swissFileIn = new File(
                 dirIn,
                 "slope_area2.csv");
-        File fileOut;
-        TreeMap<Integer, Object[]> allData = readData(fileIn);
-        PrintDataSummary(allData);
+        File austriaFileIn;
+        austriaFileIn = new File(
+                dirIn,
+                "Austria_proglac_export.txt");
 
-        int n;
-        //n = 1000;//5;
-        n = allData.size();
-        int counter = 0;
+        File swissFileOut2;
+        swissFileOut2 = new File(
+                swissDirOut,
+                //"SwissID_LogSlope.txt");
+                "SwissID_Slope.txt");
+        File austriaFileOut2;
+        austriaFileOut2 = new File(
+                austriaDirOut,
+                //"AustriaID_LogSlope.txt");
+                "AustriaID_Slope.txt");
 
+//        System.out.println("Swiss");
+//        TreeMap<Integer, Object[]> swissData = readSwissData(swissFileIn);
+//        PrintDataSummary(swissData);
+//        run(swissData,
+//                swissDirOut,
+//                swissFileOut2,
+//                minNumberOfDataPoints);
+
+        System.out.println("Austria");
+        TreeMap<Integer, Object[]> austriaData = readAustriaData(austriaFileIn);
+        PrintDataSummary(austriaData);
+        run(austriaData,
+                austriaDirOut,
+                austriaFileOut2,
+                minNumberOfDataPoints);
+    }
+
+    public void run(
+            TreeMap<Integer, Object[]> allData,
+            File outDir,
+            File outFile2,
+            int minNumberOfDataPoints) {
+        File outfile;
+        PrintWriter pw = null;
+        try {
+            pw = new PrintWriter(outFile2);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(SlopeAreaAnalysis.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        //pw.println("ID, log(Slope)");
+        pw.println("ID, Slope");
         int dataWidth = 500;//400;//250;
         int dataHeight = 500;//657;
-        String xAxisLabel = "Slope";
-        String yAxisLabel = "Upstream accumulation area";
+        String xAxisLabel = "x = log(Slope)";
+        String yAxisLabel = "y = log(Upstream Accumulation Area)";
         boolean drawOriginLinesOnPlot;
 //        drawOriginLinesOnPlot = true;
         drawOriginLinesOnPlot = false;
@@ -88,49 +137,64 @@ public class SlopeAreaAnalysis {
 
         String format = "PNG";
         String title;
-        title = "Title";
-
+        
         Iterator<Integer> ite;
         ite = allData.keySet().iterator();
         int ID;
         Object[] data;
         while (ite.hasNext()) {
             ID = ite.next();
-            if (ID == 388) {
-                if (counter < n) {
-                    title = "GlacierID = " + ID;
-                    fileOut = new File(
-                            dirOut,
-                            "SlopeUAAScatterPlot" + ID + ".PNG");
-                    data = allData.get(ID);
-                    ArrayList<Generic_XYNumericalData> theGeneric_XYNumericalData;
-                    theGeneric_XYNumericalData = (ArrayList<Generic_XYNumericalData>) data[0];
-                    if (theGeneric_XYNumericalData.size() > minNumberOfDataPoints) {
-                        plot = new SlopeAreaScatterPlot(
-                                data,
-                                executorService,
-                                fileOut,
-                                format,
-                                title,
-                                dataWidth,
-                                dataHeight,
-                                xAxisLabel,
-                                yAxisLabel,
-                                drawOriginLinesOnPlot,
-                                decimalPlacePrecisionForCalculations,
-                                decimalPlacePrecisionForDisplay,
-                                aRoundingMode);
-                        //plot.setData(plot.getDefaultData());
-                        //plot.setStartAgeOfEndYearInterval(0); // To avoid null pointer
-                        plot.run();
-                        counter++;
+            //if (ID == 388) {
+
+            data = allData.get(ID);
+            ArrayList<Generic_XYNumericalData> theGeneric_XYNumericalData;
+            theGeneric_XYNumericalData = (ArrayList<Generic_XYNumericalData>) data[0];
+            int np;
+            np = theGeneric_XYNumericalData.size();
+            for (int degree = 2; degree < 3; degree++) {
+                title = "GlacierID " + ID + ", n = " + np;
+                //title += ", degree = " + degree;
+                File outDir2 = new File(
+                        outDir,
+                        "degree" + degree);
+                outDir2.mkdirs();
+                outfile = new File(
+                        outDir2,
+                        "SlopeUAAScatterPlot" + ID + ".PNG");
+                if (np >= minNumberOfDataPoints) {
+                    plot = new SlopeAreaScatterPlot(
+                            degree,
+                            data,
+                            executorService,
+                            outfile,
+                            format,
+                            title,
+                            dataWidth,
+                            dataHeight,
+                            xAxisLabel,
+                            yAxisLabel,
+                            drawOriginLinesOnPlot,
+                            decimalPlacePrecisionForCalculations,
+                            decimalPlacePrecisionForDisplay,
+                            aRoundingMode);
+                    //plot.setData(plot.getDefaultData());
+                    //plot.setStartAgeOfEndYearInterval(0); // To avoid null pointer
+                    plot.run();
+                    if (plot.isHump) {
+                        System.out.println("" + ID + ", " + plot.xAtMaxy2);
+                        double x = Math.pow(10.0d, plot.xAtMaxy2);
+                        //pw.println("" + ID + ", " + plot.xAtMaxy2);
+                        pw.println("" + ID + ", " + x);
                     }
                 }
             }
+            pw.flush();
+            //}
         }
+                pw.close();
     }
 
-    protected TreeMap<Integer, Object[]> readData(File fileIn) {
+    protected TreeMap<Integer, Object[]> readSwissData(File fileIn) {
         TreeMap<Integer, Object[]> result;
         result = new TreeMap<Integer, Object[]>();
         BufferedReader br;
@@ -157,7 +221,7 @@ public class SlopeAreaAnalysis {
                         fields = line.split(sComma);
                         ID = Integer.valueOf(fields[3]);
                         if (ID > 0) {
-                            BigDecimal flowacc;
+                            //BigDecimal flowacc;
                             BigDecimal area;
                             BigDecimal slope;
                             Object[] data;
@@ -188,8 +252,103 @@ public class SlopeAreaAnalysis {
                                 miny = (BigDecimal) data[4];
                             }
                             //pointID = Integer.valueOf(fields[4]);
-                            flowacc = new BigDecimal(fields[0]);
+                            //flowacc = new BigDecimal(fields[0]);
                             area = new BigDecimal(fields[1]);
+                            if (area.compareTo(BigDecimal.ZERO) == 1) {
+                                area = Generic_BigDecimal.log(10, area, 10, RoundingMode.HALF_UP);
+                            } else {
+                                area = BigDecimal.ZERO;
+                            }
+                            slope = new BigDecimal(fields[2]);
+                            if (slope.compareTo(BigDecimal.ZERO) == 1) {
+                                slope = Generic_BigDecimal.log(10, slope, 10, RoundingMode.HALF_UP);
+                            } else {
+                                slope = BigDecimal.ZERO;
+                            }
+                            Generic_XYNumericalData point;
+                            point = new Generic_XYNumericalData(
+                                    slope,
+                                    area);
+                            theGeneric_XYNumericalData.add(point);
+                            data[0] = theGeneric_XYNumericalData;
+                            data[1] = maxx.max(slope);
+                            data[2] = minx.min(slope);
+                            data[3] = maxy.max(area);
+                            data[4] = miny.min(area);
+                        }
+                        break;
+                    case StreamTokenizer.TT_WORD:
+                        line = st.sval;
+                        break;
+                }
+                token = st.nextToken();
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(SlopeAreaAnalysis.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return result;
+    }
+
+    protected TreeMap<Integer, Object[]> readAustriaData(File fileIn) {
+        TreeMap<Integer, Object[]> result;
+        result = new TreeMap<Integer, Object[]>();
+        BufferedReader br;
+        br = Generic_StaticIO.getBufferedReader(fileIn);
+        StreamTokenizer st;
+        st = new StreamTokenizer(br);
+        Generic_StaticIO.setStreamTokenizerSyntax5(st);
+        st.wordChars('(', '(');
+        st.wordChars(')', ')');
+        st.wordChars('%', '%');
+        Generic_StaticIO.skipline(st);
+        int token;
+        String line = "";
+        String[] fields;
+        try {
+            token = st.nextToken();
+            int ID;
+            //int pointID;
+            while (token != StreamTokenizer.TT_EOF) {
+                switch (token) {
+                    case StreamTokenizer.TT_EOL:
+                        //flowacc,area (km2),slope_25_(%),proglac_ID,COUNT
+                        //12.11111069,0.00756944,32.33880000000,0,250631
+                        fields = line.split(sComma);
+                        ID = Double.valueOf(fields[1]).intValue();
+                        if (ID > 0) {
+                            //BigDecimal flowacc;
+                            BigDecimal area;
+                            BigDecimal slope;
+                            Object[] data;
+                            BigDecimal maxx;
+                            BigDecimal maxy;
+                            BigDecimal minx;
+                            BigDecimal miny;
+                            data = result.get(ID);
+                            ArrayList<Generic_XYNumericalData> theGeneric_XYNumericalData;
+                            if (data == null) {
+                                data = new Object[5];
+                                theGeneric_XYNumericalData = new ArrayList<Generic_XYNumericalData>();
+                                maxx = BigDecimal.ZERO;
+                                maxy = BigDecimal.ZERO;
+                                minx = BigDecimal.valueOf(Double.MAX_VALUE);
+                                miny = BigDecimal.valueOf(Double.MAX_VALUE);
+                                data[0] = theGeneric_XYNumericalData;
+                                data[1] = maxx;
+                                data[2] = minx;
+                                data[3] = maxy;
+                                data[4] = miny;
+                                result.put(ID, data);
+                            } else {
+                                theGeneric_XYNumericalData = (ArrayList<Generic_XYNumericalData>) data[0];
+                                maxx = (BigDecimal) data[1];
+                                minx = (BigDecimal) data[2];
+                                maxy = (BigDecimal) data[3];
+                                miny = (BigDecimal) data[4];
+                            }
+                            //pointID = Integer.valueOf(fields[4]);
+                            //flowacc = new BigDecimal(fields[0]);
+                            area = new BigDecimal(fields[3]);
                             if (area.compareTo(BigDecimal.ZERO) == 1) {
                                 area = Generic_BigDecimal.log(10, area, 10, RoundingMode.HALF_UP);
                             } else {
