@@ -7,8 +7,8 @@ package uk.ac.leeds.ccg.andyt.projects.fluvialglacial;
 
 import java.io.File;
 import uk.ac.leeds.ccg.andyt.grids.core.Grids_AbstractGrid2DSquareCell;
-import uk.ac.leeds.ccg.andyt.grids.core.Grid2DSquareCellDouble;
-import uk.ac.leeds.ccg.andyt.grids.core.Grid2DSquareCellDoubleFactory;
+import uk.ac.leeds.ccg.andyt.grids.core.Grids_Grid2DSquareCellDouble;
+import uk.ac.leeds.ccg.andyt.grids.core.Grids_Grid2DSquareCellDoubleFactory;
 import uk.ac.leeds.ccg.andyt.grids.core.Grids_Environment;
 import uk.ac.leeds.ccg.andyt.grids.process.Grid2DSquareCellProcessorDEM;
 
@@ -34,8 +34,8 @@ public class Geomorphometrics {
         Grid2DSquareCellProcessorDEM Grid2DSquareCellProcessorDEM;
         Grid2DSquareCellProcessorDEM = new Grid2DSquareCellProcessorDEM(ge, workspace);
         
-        Grid2DSquareCellDoubleFactory factory;
-        factory = new Grid2DSquareCellDoubleFactory(ge, true);
+        Grids_Grid2DSquareCellDoubleFactory factory;
+        factory = new Grids_Grid2DSquareCellDoubleFactory(ge, true);
         
         File inputfile;
         inputfile = new File(dir,

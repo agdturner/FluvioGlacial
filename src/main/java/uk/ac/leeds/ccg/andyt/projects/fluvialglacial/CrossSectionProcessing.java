@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import uk.ac.leeds.ccg.andyt.generic.io.Generic_StaticIO;
-import uk.ac.leeds.ccg.andyt.grids.utilities.FileCreator;
+import uk.ac.leeds.ccg.andyt.grids.utilities.Grids_FileCreator;
 
 /**
  * A class for processing data representing a fluvial glacial outburst flood.
@@ -62,7 +62,7 @@ public class CrossSectionProcessing {
     File _Directory_File;
 
     public CrossSectionProcessing() {
-        this(FileCreator.createNewFile());
+        this(Grids_FileCreator.createNewFile());
     }
 
     public CrossSectionProcessing(File directory) {

@@ -26,15 +26,15 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.TreeMap;
 import uk.ac.leeds.ccg.andyt.generic.math.Generic_BigDecimal;
-import uk.ac.leeds.ccg.andyt.grids.core.AbstractGridStatistics;
-import uk.ac.leeds.ccg.andyt.grids.core.Grid2DSquareCellDouble;
-import uk.ac.leeds.ccg.andyt.grids.core.Grid2DSquareCellDoubleFactory;
-import uk.ac.leeds.ccg.andyt.grids.core.GridStatistics0;
-import uk.ac.leeds.ccg.andyt.grids.core.GridStatistics1;
+import uk.ac.leeds.ccg.andyt.grids.core.Grids_AbstractGridStatistics;
+import uk.ac.leeds.ccg.andyt.grids.core.Grids_Grid2DSquareCellDouble;
+import uk.ac.leeds.ccg.andyt.grids.core.Grids_Grid2DSquareCellDoubleFactory;
+import uk.ac.leeds.ccg.andyt.grids.core.Grids_GridStatistics0;
+import uk.ac.leeds.ccg.andyt.grids.core.Grids_GridStatistics1;
 import uk.ac.leeds.ccg.andyt.grids.core.Grids_Environment;
-import uk.ac.leeds.ccg.andyt.grids.exchange.ESRIAsciiGridExporter;
-import uk.ac.leeds.ccg.andyt.grids.exchange.ESRIAsciiGridImporter;
-import uk.ac.leeds.ccg.andyt.grids.utilities.FileCreator;
+import uk.ac.leeds.ccg.andyt.grids.exchange.Grids_ESRIAsciiGridExporter;
+import uk.ac.leeds.ccg.andyt.grids.exchange.Grids_ESRIAsciiGridImporter;
+import uk.ac.leeds.ccg.andyt.grids.utilities.Grids_FileCreator;
 
 /**
  * A class developed for processing stream temperature data.
@@ -43,23 +43,23 @@ public class TemperatureGridDataProcessing {
 
     File _Directory_File;
     Grids_Environment _Grids_Environment;
-    Grid2DSquareCellDoubleFactory _Grid2DSquareCellDoubleFactory;
+    Grids_Grid2DSquareCellDoubleFactory _Grid2DSquareCellDoubleFactory;
     //Grid2DSquareCellProcessor _Grid2DSquareCellProcessor;
-    ESRIAsciiGridImporter _ESRIAsciiGridImporter;
+    Grids_ESRIAsciiGridImporter _ESRIAsciiGridImporter;
     boolean _HandleOutOfMemoryError;
     String _FileSeparator;
     //ImageExporter _ImageExporter;
     String[] _ImageTypes;
-    ESRIAsciiGridExporter _ESRIAsciiGridExporter;
+    Grids_ESRIAsciiGridExporter _ESRIAsciiGridExporter;
 
     public TemperatureGridDataProcessing() {
-        this(FileCreator.createNewFile());
+        this(Grids_FileCreator.createNewFile());
     }
 
     public TemperatureGridDataProcessing(File directory) {
         _Directory_File = directory;
         _Grids_Environment = new Grids_Environment();
-        _Grid2DSquareCellDoubleFactory = new Grid2DSquareCellDoubleFactory(
+        _Grid2DSquareCellDoubleFactory = new Grids_Grid2DSquareCellDoubleFactory(
                 _Grids_Environment, _HandleOutOfMemoryError);
 //        // No need to set these here!.
 //        _Grid2DSquareCellDoubleFactory.set_NoDataValue(-9999.0d);
@@ -377,28 +377,28 @@ public class TemperatureGridDataProcessing {
         int numberOfOutputs = 32;
         Object[] result = new Object[numberOfOutputs];
         int outputIndex = 0;
-//        Grid2DSquareCellDouble a_Grid2DSquareCellDouble = 
-//                (Grid2DSquareCellDouble) 
+//        Grids_Grid2DSquareCellDouble a_Grid2DSquareCellDouble = 
+//                (Grids_Grid2DSquareCellDouble) 
 //                _Grid2DSquareCellProcessor._Grid2DSquareCellDoubleFactory.create(
 //                inputFile);
-        Grid2DSquareCellDouble a_Grid2DSquareCellDouble = 
-                (Grid2DSquareCellDouble) _Grid2DSquareCellDoubleFactory.create(
+        Grids_Grid2DSquareCellDouble a_Grid2DSquareCellDouble = 
+                (Grids_Grid2DSquareCellDouble) _Grid2DSquareCellDoubleFactory.create(
                 inputFile);
 //        System.out.println("a_Grid2DSquareCellDouble " + 
 //                a_Grid2DSquareCellDouble.toString(_HandleOutOfMemoryError));
-        AbstractGridStatistics a_Grid2DSquareCellDouble_AbstractGridStatistics = 
+        Grids_AbstractGridStatistics a_Grid2DSquareCellDouble_AbstractGridStatistics = 
                 a_Grid2DSquareCellDouble.getGridStatistics(
                 _HandleOutOfMemoryError);
 //        System.out.println("a_Grid2DSquareCellDouble_AbstractGridStatistics " + 
 //                a_Grid2DSquareCellDouble_AbstractGridStatistics.toString(
 //                _HandleOutOfMemoryError));
-        GridStatistics1 a_Grid2DSquareCellDouble_GridStatistics1 = 
-                (GridStatistics1) a_Grid2DSquareCellDouble_AbstractGridStatistics;
+        Grids_GridStatistics1 a_Grid2DSquareCellDouble_GridStatistics1 = 
+                (Grids_GridStatistics1) a_Grid2DSquareCellDouble_AbstractGridStatistics;
 //        System.out.println("a_Grid2DSquareCellDouble_GridStatistics1 " + 
 //                a_Grid2DSquareCellDouble_GridStatistics1.toString(
 //                _HandleOutOfMemoryError));
-        GridStatistics0 a_Grid2DSquareCellDouble_GridStatistics0 = 
-                new GridStatistics0(a_Grid2DSquareCellDouble);
+        Grids_GridStatistics0 a_Grid2DSquareCellDouble_GridStatistics0 = 
+                new Grids_GridStatistics0(a_Grid2DSquareCellDouble);
 //        System.out.println("a_Grid2DSquareCellDouble_GridStatistics0 " + 
 //                a_Grid2DSquareCellDouble_GridStatistics0.toString(
 //                _HandleOutOfMemoryError));
