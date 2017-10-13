@@ -10,7 +10,7 @@ import uk.ac.leeds.ccg.andyt.grids.core.Grids_AbstractGrid2DSquareCell;
 import uk.ac.leeds.ccg.andyt.grids.core.Grids_Grid2DSquareCellDouble;
 import uk.ac.leeds.ccg.andyt.grids.core.Grids_Grid2DSquareCellDoubleFactory;
 import uk.ac.leeds.ccg.andyt.grids.core.Grids_Environment;
-import uk.ac.leeds.ccg.andyt.grids.process.Grid2DSquareCellProcessorDEM;
+import uk.ac.leeds.ccg.andyt.grids.process.Grids_ProcessorDEM;
 
 /**
  *
@@ -31,8 +31,8 @@ public class Geomorphometrics {
         
         Grids_Environment ge;
         ge = new Grids_Environment();
-        Grid2DSquareCellProcessorDEM Grid2DSquareCellProcessorDEM;
-        Grid2DSquareCellProcessorDEM = new Grid2DSquareCellProcessorDEM(ge, workspace);
+        Grids_ProcessorDEM Grid2DSquareCellProcessorDEM;
+        Grid2DSquareCellProcessorDEM = new Grids_ProcessorDEM(ge, workspace);
         
         Grids_Grid2DSquareCellDoubleFactory factory;
         factory = new Grids_Grid2DSquareCellDoubleFactory(ge, true);
