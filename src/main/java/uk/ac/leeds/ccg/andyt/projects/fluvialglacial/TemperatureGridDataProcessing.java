@@ -26,25 +26,22 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.TreeMap;
 import uk.ac.leeds.ccg.andyt.generic.math.Generic_BigDecimal;
-import uk.ac.leeds.ccg.andyt.grids.core.Grids_AbstractGridStatistics;
-import uk.ac.leeds.ccg.andyt.grids.core.Grids_Grid2DSquareCellDouble;
-import uk.ac.leeds.ccg.andyt.grids.core.Grids_Grid2DSquareCellDoubleFactory;
-import uk.ac.leeds.ccg.andyt.grids.core.Grids_GridStatistics0;
-import uk.ac.leeds.ccg.andyt.grids.core.Grids_GridStatistics1;
+import uk.ac.leeds.ccg.andyt.grids.core.statistics.Grids_AbstractGridStatistics;
+import uk.ac.leeds.ccg.andyt.grids.core.grid.Grids_Grid2DSquareCellDouble;
+import uk.ac.leeds.ccg.andyt.grids.core.grid.Grids_Grid2DSquareCellDoubleFactory;
+import uk.ac.leeds.ccg.andyt.grids.core.statistics.Grids_GridStatistics0;
+import uk.ac.leeds.ccg.andyt.grids.core.statistics.Grids_GridStatistics1;
 import uk.ac.leeds.ccg.andyt.grids.core.Grids_Environment;
 import uk.ac.leeds.ccg.andyt.grids.exchange.Grids_ESRIAsciiGridExporter;
 import uk.ac.leeds.ccg.andyt.grids.exchange.Grids_ESRIAsciiGridImporter;
+import uk.ac.leeds.ccg.andyt.grids.process.Grids_ProcessorDEM;
 import uk.ac.leeds.ccg.andyt.grids.utilities.Grids_FileCreator;
 
 /**
  * A class developed for processing stream temperature data.
  */
-public class TemperatureGridDataProcessing {
+public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
 
-    File _Directory_File;
-    Grids_Environment _Grids_Environment;
-    Grids_Grid2DSquareCellDoubleFactory _Grid2DSquareCellDoubleFactory;
-    //Grid2DSquareCellProcessor _Grid2DSquareCellProcessor;
     Grids_ESRIAsciiGridImporter _ESRIAsciiGridImporter;
     boolean _HandleOutOfMemoryError;
     String _FileSeparator;
@@ -52,28 +49,10 @@ public class TemperatureGridDataProcessing {
     String[] _ImageTypes;
     Grids_ESRIAsciiGridExporter _ESRIAsciiGridExporter;
 
-    public TemperatureGridDataProcessing() {
-        this(Grids_FileCreator.createNewFile());
-    }
+    protected TemperatureGridDataProcessing() {}
 
-    public TemperatureGridDataProcessing(File directory) {
-        _Directory_File = directory;
-        _Grids_Environment = new Grids_Environment();
-        _Grid2DSquareCellDoubleFactory = new Grids_Grid2DSquareCellDoubleFactory(
-                _Grids_Environment, _HandleOutOfMemoryError);
-//        // No need to set these here!.
-//        _Grid2DSquareCellDoubleFactory.set_NoDataValue(-9999.0d);
-//        BigDecimal[] dimensions = new BigDecimal[5];
-//        dimensions[0] = new BigDecimal("1");
-//        dimensions[1] = new BigDecimal("1");
-//        dimensions[2] = new BigDecimal("1");
-//        dimensions[3] = new BigDecimal("1");
-//        dimensions[4] = new BigDecimal("1");
-//        _Grid2DSquareCellDoubleFactory.set_Dimensions(dimensions);
-//        _Grid2DSquareCellProcessor = new Grid2DSquareCellProcessor(
-//                _Grids_Environment);
-//        _Grid2DSquareCellProcessor.set_Directory(
-//                directory, false, _HandleOutOfMemoryError);
+    public TemperatureGridDataProcessing(Grids_Environment ge) {
+        super(ge);
     }
 
     /**
@@ -100,9 +79,11 @@ public class TemperatureGridDataProcessing {
                 throw new IOException("Directory " + directory + " does not "
                         + "exist");
             }
+            Grids_Environment ge;
+            ge = new Grids_Environment(directory);
             //File directory = new File( "/scratch01/Work/Projects/"
             //            + "StreamTemperatureGridGeneralisation/workspace/");
-            new TemperatureGridDataProcessing(directory).run();
+            new TemperatureGridDataProcessing(ge).run();
         } catch (Error e) {
             System.err.println(e.getLocalizedMessage());
             //e.printStackTrace();
@@ -127,7 +108,7 @@ public class TemperatureGridDataProcessing {
             double startIntervalBound) {
         String month = "August";
         File inputDirectory = new File(
-                _Directory_File.getAbsolutePath() + "/input/" + month + "/");
+                get_Directory(_HandleOutOfMemoryError).getAbsolutePath() + "/input/" + month + "/");
         File outputDirectory = getOutputFile(
                 intervalRange, startIntervalBound, month);
         File inputFile = new File(inputDirectory, "27t1700.txt");
@@ -143,7 +124,7 @@ public class TemperatureGridDataProcessing {
             double startIntervalBound,
             String month) {
         return new File(
-                _Directory_File.getAbsolutePath() + "/output/" + 
+                get_Directory(_HandleOutOfMemoryError).getAbsolutePath() + "/output/" + 
                 intervalRange + "_" + startIntervalBound + "/" + month + "/");
     }
 
@@ -153,7 +134,7 @@ public class TemperatureGridDataProcessing {
             throws IOException {
         String month = "July";
         File inputDirectory = new File(
-                _Directory_File.getAbsolutePath() + "/input/" + month);
+                get_Directory(_HandleOutOfMemoryError).getAbsolutePath() + "/input/" + month);
         File outputDirectory = getOutputFile(
                 intervalRange, startIntervalBound, month);
         outputDirectory.mkdirs();
@@ -238,7 +219,7 @@ public class TemperatureGridDataProcessing {
             throws IOException {
         String month = "August";
         File inputDirectory = new File(
-                _Directory_File.getAbsolutePath() + "/input/" + month);
+                get_Directory(_HandleOutOfMemoryError).getAbsolutePath() + "/input/" + month);
         File outputDirectory = getOutputFile(
                 intervalRange, startIntervalBound, month);
         outputDirectory.mkdirs();

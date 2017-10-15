@@ -6,9 +6,9 @@
 package uk.ac.leeds.ccg.andyt.projects.fluvialglacial;
 
 import java.io.File;
-import uk.ac.leeds.ccg.andyt.grids.core.Grids_AbstractGrid2DSquareCell;
-import uk.ac.leeds.ccg.andyt.grids.core.Grids_Grid2DSquareCellDouble;
-import uk.ac.leeds.ccg.andyt.grids.core.Grids_Grid2DSquareCellDoubleFactory;
+import uk.ac.leeds.ccg.andyt.grids.core.grid.Grids_AbstractGrid2DSquareCell;
+import uk.ac.leeds.ccg.andyt.grids.core.grid.Grids_Grid2DSquareCellDouble;
+import uk.ac.leeds.ccg.andyt.grids.core.grid.Grids_Grid2DSquareCellDoubleFactory;
 import uk.ac.leeds.ccg.andyt.grids.core.Grids_Environment;
 import uk.ac.leeds.ccg.andyt.grids.process.Grids_ProcessorDEM;
 
@@ -27,29 +27,31 @@ public class Geomorphometrics {
         dir = new File("/nfs/see-fs-02_users/geoagdt/scratch01/Work/people/Scott Watson/");
 
         File workspace;
-        workspace = new File("/nfs/see-fs-02_users/geoagdt/scratch01/Work/people/Scott Watson/workspace");
+        workspace = new File(
+                dir,
+                "workspace");
         
         Grids_Environment ge;
-        ge = new Grids_Environment();
-        Grids_ProcessorDEM Grid2DSquareCellProcessorDEM;
-        Grid2DSquareCellProcessorDEM = new Grids_ProcessorDEM(ge, workspace);
+        ge = new Grids_Environment(workspace);
+        Grids_ProcessorDEM p;
+        p = new Grids_ProcessorDEM(ge);
         
-        Grids_Grid2DSquareCellDoubleFactory factory;
-        factory = new Grids_Grid2DSquareCellDoubleFactory(ge, true);
+        Grids_Grid2DSquareCellDoubleFactory gf;
+        gf = new Grids_Grid2DSquareCellDoubleFactory(ge, true);
         
         File inputfile;
         inputfile = new File(dir,
                 "rastert_kdem_oc1.txt");
 
         Grids_AbstractGrid2DSquareCell input;
-        input = factory.create(inputfile);
+        input = gf.create(inputfile);
         
-//        Grid2DSquareCellProcessorDEM.getMetrics1(
+//        p.getMetrics1(
 //                input,
 //                0,
 //                0,
 //                0,
-//                factory,
+//                gf,
 //                _Grid2DSquareCellIntFactory,
 //                true, true, true);
         
