@@ -391,12 +391,12 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
         BigDecimal mean_BigDecimal = 
                 a_Grid2DSquareCellDouble_GridStatistics1.getArithmeticMeanBigDecimal(
                 numberOfDecimalPlaces_10, _HandleOutOfMemoryError);
-        double min = a_Grid2DSquareCellDouble_GridStatistics1.getMinDouble(
+        double min = a_Grid2DSquareCellDouble_GridStatistics1.getMinDouble(true, 
                 _HandleOutOfMemoryError);
         System.out.println("min " + min);
         result[outputIndex] = min;
         outputIndex++;
-        double max = a_Grid2DSquareCellDouble_GridStatistics1.getMaxDouble(
+        double max = a_Grid2DSquareCellDouble_GridStatistics1.getMaxDouble(true, 
                 _HandleOutOfMemoryError);
         System.out.println("max " + max);
         result[outputIndex] = max;
