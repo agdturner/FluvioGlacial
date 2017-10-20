@@ -108,7 +108,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             double startIntervalBound) {
         String month = "August";
         File inputDirectory = new File(
-                get_Directory(_HandleOutOfMemoryError).getAbsolutePath() + "/input/" + month + "/");
+                getDirectory(_HandleOutOfMemoryError).getAbsolutePath() + "/input/" + month + "/");
         File outputDirectory = getOutputFile(
                 intervalRange, startIntervalBound, month);
         File inputFile = new File(inputDirectory, "27t1700.txt");
@@ -124,7 +124,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             double startIntervalBound,
             String month) {
         return new File(
-                get_Directory(_HandleOutOfMemoryError).getAbsolutePath() + "/output/" + 
+                getDirectory(_HandleOutOfMemoryError).getAbsolutePath() + "/output/" + 
                 intervalRange + "_" + startIntervalBound + "/" + month + "/");
     }
 
@@ -134,7 +134,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             throws IOException {
         String month = "July";
         File inputDirectory = new File(
-                get_Directory(_HandleOutOfMemoryError).getAbsolutePath() + "/input/" + month);
+                getDirectory(_HandleOutOfMemoryError).getAbsolutePath() + "/input/" + month);
         File outputDirectory = getOutputFile(
                 intervalRange, startIntervalBound, month);
         outputDirectory.mkdirs();
@@ -219,7 +219,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             throws IOException {
         String month = "August";
         File inputDirectory = new File(
-                get_Directory(_HandleOutOfMemoryError).getAbsolutePath() + "/input/" + month);
+                getDirectory(_HandleOutOfMemoryError).getAbsolutePath() + "/input/" + month);
         File outputDirectory = getOutputFile(
                 intervalRange, startIntervalBound, month);
         outputDirectory.mkdirs();
@@ -360,10 +360,10 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
         int outputIndex = 0;
 //        Grids_Grid2DSquareCellDouble a_Grid2DSquareCellDouble = 
 //                (Grids_Grid2DSquareCellDouble) 
-//                _Grid2DSquareCellProcessor._Grid2DSquareCellDoubleFactory.create(
+//                _Grid2DSquareCellProcessor.Grid2DSquareCellDoubleFactory.create(
 //                inputFile);
         Grids_Grid2DSquareCellDouble a_Grid2DSquareCellDouble = 
-                (Grids_Grid2DSquareCellDouble) _Grid2DSquareCellDoubleFactory.create(
+                (Grids_Grid2DSquareCellDouble) Grid2DSquareCellDoubleFactory.create(
                 inputFile);
 //        System.out.println("a_Grid2DSquareCellDouble " + 
 //                a_Grid2DSquareCellDouble.toString(_HandleOutOfMemoryError));
@@ -426,15 +426,15 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
                 new BigDecimal("" + startIntervalBound);
 
         double noDataValue = 
-                a_Grid2DSquareCellDouble.get_NoDataValue(_HandleOutOfMemoryError);
+                a_Grid2DSquareCellDouble.getNoDataValue(_HandleOutOfMemoryError);
         //System.out.println("NoDataValue " + noDataValue);
 
         long row;
         long col;
         long a_Grid2DSquareCellDouble_NRows = 
-                a_Grid2DSquareCellDouble.get_NRows(_HandleOutOfMemoryError);
+                a_Grid2DSquareCellDouble.getNRows(_HandleOutOfMemoryError);
         long a_Grid2DSquareCellDouble_NCols = 
-                a_Grid2DSquareCellDouble.get_NCols(_HandleOutOfMemoryError);
+                a_Grid2DSquareCellDouble.getNCols(_HandleOutOfMemoryError);
 //        HashMap<Double,Long> value_Grid2DSquareCellDoubleValue_HashMap = 
 //                new HashMap<Double,Long>();
 //        HashMap<Long,Long> interval_Grid2DSquareCellDoubleValue_HashMap = 
