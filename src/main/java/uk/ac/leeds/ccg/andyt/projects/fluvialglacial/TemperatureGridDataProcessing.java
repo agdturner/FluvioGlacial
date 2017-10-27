@@ -27,8 +27,8 @@ import java.util.Iterator;
 import java.util.TreeMap;
 import uk.ac.leeds.ccg.andyt.generic.math.Generic_BigDecimal;
 import uk.ac.leeds.ccg.andyt.grids.core.statistics.Grids_AbstractGridStatistics;
-import uk.ac.leeds.ccg.andyt.grids.core.grid.Grids_Grid2DSquareCellDouble;
-import uk.ac.leeds.ccg.andyt.grids.core.grid.Grids_Grid2DSquareCellDoubleFactory;
+import uk.ac.leeds.ccg.andyt.grids.core.grid.Grids_GridDouble;
+import uk.ac.leeds.ccg.andyt.grids.core.grid.Grids_GridDoubleFactory;
 import uk.ac.leeds.ccg.andyt.grids.core.statistics.Grids_GridStatistics0;
 import uk.ac.leeds.ccg.andyt.grids.core.statistics.Grids_GridStatistics1;
 import uk.ac.leeds.ccg.andyt.grids.core.Grids_Environment;
@@ -358,12 +358,12 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
         int numberOfOutputs = 32;
         Object[] result = new Object[numberOfOutputs];
         int outputIndex = 0;
-//        Grids_Grid2DSquareCellDouble a_Grid2DSquareCellDouble = 
-//                (Grids_Grid2DSquareCellDouble) 
+//        Grids_GridDouble a_Grid2DSquareCellDouble = 
+//                (Grids_GridDouble) 
 //                _Grid2DSquareCellProcessor.Grid2DSquareCellDoubleFactory.create(
 //                inputFile);
-        Grids_Grid2DSquareCellDouble a_Grid2DSquareCellDouble = 
-                (Grids_Grid2DSquareCellDouble) Grid2DSquareCellDoubleFactory.create(
+        Grids_GridDouble a_Grid2DSquareCellDouble = 
+                (Grids_GridDouble) Grid2DSquareCellDoubleFactory.create(
                 inputFile);
 //        System.out.println("a_Grid2DSquareCellDouble " + 
 //                a_Grid2DSquareCellDouble.toString(_HandleOutOfMemoryError));

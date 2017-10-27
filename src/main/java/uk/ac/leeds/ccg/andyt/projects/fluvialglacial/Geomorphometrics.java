@@ -6,9 +6,9 @@
 package uk.ac.leeds.ccg.andyt.projects.fluvialglacial;
 
 import java.io.File;
-import uk.ac.leeds.ccg.andyt.grids.core.grid.Grids_AbstractGrid2DSquareCell;
-import uk.ac.leeds.ccg.andyt.grids.core.grid.Grids_Grid2DSquareCellDouble;
-import uk.ac.leeds.ccg.andyt.grids.core.grid.Grids_Grid2DSquareCellDoubleFactory;
+import uk.ac.leeds.ccg.andyt.grids.core.grid.Grids_AbstractGridNumber;
+import uk.ac.leeds.ccg.andyt.grids.core.grid.Grids_GridDouble;
+import uk.ac.leeds.ccg.andyt.grids.core.grid.Grids_GridDoubleFactory;
 import uk.ac.leeds.ccg.andyt.grids.core.Grids_Environment;
 import uk.ac.leeds.ccg.andyt.grids.process.Grids_ProcessorDEM;
 
@@ -36,14 +36,14 @@ public class Geomorphometrics {
         Grids_ProcessorDEM p;
         p = new Grids_ProcessorDEM(ge);
         
-        Grids_Grid2DSquareCellDoubleFactory gf;
-        gf = new Grids_Grid2DSquareCellDoubleFactory(ge, true);
+        Grids_GridDoubleFactory gf;
+        gf = new Grids_GridDoubleFactory(ge, true);
         
         File inputfile;
         inputfile = new File(dir,
                 "rastert_kdem_oc1.txt");
 
-        Grids_AbstractGrid2DSquareCell input;
+        Grids_AbstractGridNumber input;
         input = gf.create(inputfile);
         
 //        p.getMetrics1(
