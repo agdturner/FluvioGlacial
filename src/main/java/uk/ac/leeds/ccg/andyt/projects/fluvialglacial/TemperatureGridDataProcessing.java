@@ -32,10 +32,10 @@ import uk.ac.leeds.ccg.andyt.grids.core.grid.Grids_GridDoubleFactory;
 import uk.ac.leeds.ccg.andyt.grids.core.statistics.Grids_GridStatistics0;
 import uk.ac.leeds.ccg.andyt.grids.core.statistics.Grids_GridStatistics1;
 import uk.ac.leeds.ccg.andyt.grids.core.Grids_Environment;
-import uk.ac.leeds.ccg.andyt.grids.exchange.Grids_ESRIAsciiGridExporter;
-import uk.ac.leeds.ccg.andyt.grids.exchange.Grids_ESRIAsciiGridImporter;
+import uk.ac.leeds.ccg.andyt.grids.io.Grids_ESRIAsciiGridExporter;
+import uk.ac.leeds.ccg.andyt.grids.io.Grids_ESRIAsciiGridImporter;
 import uk.ac.leeds.ccg.andyt.grids.process.Grids_ProcessorDEM;
-import uk.ac.leeds.ccg.andyt.grids.utilities.Grids_FileCreator;
+import uk.ac.leeds.ccg.andyt.grids.io.Grids_Files;
 
 /**
  * A class developed for processing stream temperature data.
