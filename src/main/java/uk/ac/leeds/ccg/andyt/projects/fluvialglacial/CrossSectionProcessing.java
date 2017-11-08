@@ -61,8 +61,7 @@ public class CrossSectionProcessing {
      */
     File _Directory_File;
 
-    public CrossSectionProcessing() {
-        this(Grids_Files.createNewFile());
+    protected CrossSectionProcessing() {
     }
 
     public CrossSectionProcessing(File directory) {

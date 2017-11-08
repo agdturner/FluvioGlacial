@@ -1,18 +1,18 @@
 /**
  * Copyright 2012 Andy Turner, The University of Leeds, UK
  *
- * Redistribution and use of this software in source and binary forms, with or 
+ * Redistribution and use of this software in source and binary forms, with or
  * without modification is permitted.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS "AS IS" AND ANY EXPRESS OR 
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO 
- * EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY DIRECT, INDIRECT, 
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+ * EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package uk.ac.leeds.ccg.andyt.projects.fluvialglacial;
@@ -28,14 +28,12 @@ import java.util.TreeMap;
 import uk.ac.leeds.ccg.andyt.generic.math.Generic_BigDecimal;
 import uk.ac.leeds.ccg.andyt.grids.core.grid.statistics.Grids_AbstractGridNumberStatistics;
 import uk.ac.leeds.ccg.andyt.grids.core.grid.Grids_GridDouble;
-import uk.ac.leeds.ccg.andyt.grids.core.grid.Grids_GridDoubleFactory;
-import uk.ac.leeds.ccg.andyt.grids.core.grid.statistics.Grids_GridStatistics;
-import uk.ac.leeds.ccg.andyt.grids.core.grid.statistics.Grids_GridStatisticsNotUpdatedAsDataChanged;
 import uk.ac.leeds.ccg.andyt.grids.core.Grids_Environment;
+import uk.ac.leeds.ccg.andyt.grids.core.grid.statistics.Grids_GridDoubleStatistics;
+import uk.ac.leeds.ccg.andyt.grids.core.grid.statistics.Grids_GridDoubleStatisticsNotUpdated;
 import uk.ac.leeds.ccg.andyt.grids.io.Grids_ESRIAsciiGridExporter;
 import uk.ac.leeds.ccg.andyt.grids.io.Grids_ESRIAsciiGridImporter;
 import uk.ac.leeds.ccg.andyt.grids.process.Grids_ProcessorDEM;
-import uk.ac.leeds.ccg.andyt.grids.io.Grids_Files;
 
 /**
  * A class developed for processing stream temperature data.
@@ -43,22 +41,24 @@ import uk.ac.leeds.ccg.andyt.grids.io.Grids_Files;
 public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
 
     Grids_ESRIAsciiGridImporter _ESRIAsciiGridImporter;
-    boolean _HandleOutOfMemoryError;
+    boolean HandleOutOfMemoryError;
     String _FileSeparator;
     //ImageExporter _ImageExporter;
     String[] _ImageTypes;
     Grids_ESRIAsciiGridExporter _ESRIAsciiGridExporter;
 
-    protected TemperatureGridDataProcessing() {}
+    protected TemperatureGridDataProcessing() {
+    }
 
     public TemperatureGridDataProcessing(Grids_Environment ge) {
         super(ge);
     }
 
     /**
-     * If no argument is input, the users current working directory is the 
-     * location where input data is expected to be and where output data is 
+     * If no argument is input, the users current working directory is the
+     * location where input data is expected to be and where output data is
      * written.
+     *
      * @param args the command line arguments
      */
     public static void main(String[] args) {
@@ -75,7 +75,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             } else {
                 directory = new File(args[0]);
             }
-            if (!directory.exists()){
+            if (!directory.exists()) {
                 throw new IOException("Directory " + directory + " does not "
                         + "exist");
             }
@@ -108,7 +108,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             double startIntervalBound) {
         String month = "August";
         File inputDirectory = new File(
-                getDirectory(_HandleOutOfMemoryError).getAbsolutePath() + "/input/" + month + "/");
+                getDirectory(HandleOutOfMemoryError).getAbsolutePath() + "/input/" + month + "/");
         File outputDirectory = getOutputFile(
                 intervalRange, startIntervalBound, month);
         File inputFile = new File(inputDirectory, "27t1700.txt");
@@ -124,8 +124,8 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             double startIntervalBound,
             String month) {
         return new File(
-                getDirectory(_HandleOutOfMemoryError).getAbsolutePath() + "/output/" + 
-                intervalRange + "_" + startIntervalBound + "/" + month + "/");
+                getDirectory(HandleOutOfMemoryError).getAbsolutePath() + "/output/"
+                + intervalRange + "_" + startIntervalBound + "/" + month + "/");
     }
 
     public void runJuly(
@@ -134,7 +134,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             throws IOException {
         String month = "July";
         File inputDirectory = new File(
-                getDirectory(_HandleOutOfMemoryError).getAbsolutePath() + "/input/" + month);
+                getDirectory(HandleOutOfMemoryError).getAbsolutePath() + "/input/" + month);
         File outputDirectory = getOutputFile(
                 intervalRange, startIntervalBound, month);
         outputDirectory.mkdirs();
@@ -142,8 +142,8 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
                 new File(outputDirectory, month + ".csv"));
         int expectedNumberOfFiles = (5 * 24 + 1);
         System.out.println("expectedNumberOfFiles " + expectedNumberOfFiles);
-        System.out.println("inputDirectory.listFiles().length " + 
-                inputDirectory.listFiles().length);
+        System.out.println("inputDirectory.listFiles().length "
+                + inputDirectory.listFiles().length);
         Object[] result = new Object[expectedNumberOfFiles];
         File inputFile;
         String filename;
@@ -179,7 +179,6 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
 
         // Dominance
         //double[] dominance = getDominance(result);
-
         // Write results
         String line = getOutputHeader();
         output_PrintWriter.println(line);
@@ -219,7 +218,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             throws IOException {
         String month = "August";
         File inputDirectory = new File(
-                getDirectory(_HandleOutOfMemoryError).getAbsolutePath() + "/input/" + month);
+                getDirectory(HandleOutOfMemoryError).getAbsolutePath() + "/input/" + month);
         File outputDirectory = getOutputFile(
                 intervalRange, startIntervalBound, month);
         outputDirectory.mkdirs();
@@ -227,8 +226,8 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
                 new File(outputDirectory, month + ".csv"));
         int expectedNumberOfFiles = (6 * 24 + 1);
         System.out.println("expectedNumberOfFiles " + expectedNumberOfFiles);
-        System.out.println("inputDirectory.listFiles().length " + 
-                inputDirectory.listFiles().length);
+        System.out.println("inputDirectory.listFiles().length "
+                + inputDirectory.listFiles().length);
         Object[] statisticsPerHour = new Object[expectedNumberOfFiles];
         File inputFile;
         String filename;
@@ -264,7 +263,6 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
 
         // Dominance
         //double[] dominance = getDominance(statisticsPerHour);
-
         // Write results
         String line = getOutputHeader();
         output_PrintWriter.println(line);
@@ -315,39 +313,21 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
     }
 
     /**
-     * @return result Object[]
-     * result[0] = min
-     * result[1] = max
-     * result[2] = mean
-     * result[3] = standard deviation
-     * result[4] = sum
-     * result[5] = n
-     * result[6] = oneCounter
-     * result[7] = zeroCounter
-     * result[8] = minIgnoringZeroAndOne
-     * result[9] = maxIgnoringZeroAndOne
-     * result[10] = rangeIgnoringZeroAndOne
-     * result[11] = meanIgnoringZeroAndOne
-     * result[12] = moment1
-     * result[13] = moment2
-     * result[14] = moment3
-     * result[15] = moment4
-     * result[16] = skewnessCyhelsky
-     * result[17] = skewness
-     * result[18] = kurtosis
-     * result[19] = variety
-     * result[20] = upperQuartile
-     * result[21] = median
-     * result[22] = lowerQuartile
-     * result[23] = mode
-     * result[24] = intervalVariety
-     * result[25] = diversity
-     * result[26] = intervalVarietyEvenness
-     * result[27] = numberOfIntervalsInRangeEvenness
-     * result[28] = maximumDiversityOverIntervalsWithValues
-     * result[29] = dominanceOverIntervalsWithValues
-     * result[30] = maximumDiversityOverIntervalsInObservedRange
-     * result[31] = dominanceOverIntervalsInObservedRange
+     * @return result Object[] result[0] = min result[1] = max result[2] = mean
+     * result[3] = standard deviation result[4] = sum result[5] = n result[6] =
+     * oneCounter result[7] = zeroCounter result[8] = minIgnoringZeroAndOne
+     * result[9] = maxIgnoringZeroAndOne result[10] = rangeIgnoringZeroAndOne
+     * result[11] = meanIgnoringZeroAndOne result[12] = moment1 result[13] =
+     * moment2 result[14] = moment3 result[15] = moment4 result[16] =
+     * skewnessCyhelsky result[17] = skewness result[18] = kurtosis result[19] =
+     * variety result[20] = upperQuartile result[21] = median result[22] =
+     * lowerQuartile result[23] = mode result[24] = intervalVariety result[25] =
+     * diversity result[26] = intervalVarietyEvenness result[27] =
+     * numberOfIntervalsInRangeEvenness result[28] =
+     * maximumDiversityOverIntervalsWithValues result[29] =
+     * dominanceOverIntervalsWithValues result[30] =
+     * maximumDiversityOverIntervalsInObservedRange result[31] =
+     * dominanceOverIntervalsInObservedRange
      */
     public Object[] getStatistics(
             File inputFile,
@@ -358,91 +338,70 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
         int numberOfOutputs = 32;
         Object[] result = new Object[numberOfOutputs];
         int outputIndex = 0;
-//        Grids_GridDouble a_Grid2DSquareCellDouble = 
-//                (Grids_GridDouble) 
-//                _Grid2DSquareCellProcessor.GridDoubleFactory.create(
-//                inputFile);
-        Grids_GridDouble a_Grid2DSquareCellDouble = 
-                (Grids_GridDouble) GridDoubleFactory.create(
-                inputFile);
-//        System.out.println("a_Grid2DSquareCellDouble " + 
-//                a_Grid2DSquareCellDouble.toString(_HandleOutOfMemoryError));
-        Grids_AbstractGridNumberStatistics a_Grid2DSquareCellDouble_AbstractGridStatistics = 
-                a_Grid2DSquareCellDouble.getStatistics(
-                _HandleOutOfMemoryError);
-//        System.out.println("a_Grid2DSquareCellDouble_AbstractGridStatistics " + 
-//                a_Grid2DSquareCellDouble_AbstractGridStatistics.toString(
-//                _HandleOutOfMemoryError));
-        Grids_GridStatisticsNotUpdatedAsDataChanged a_Grid2DSquareCellDouble_GridStatistics1 = 
-                (Grids_GridStatisticsNotUpdatedAsDataChanged) a_Grid2DSquareCellDouble_AbstractGridStatistics;
-//        System.out.println("a_Grid2DSquareCellDouble_GridStatistics1 " + 
-//                a_Grid2DSquareCellDouble_GridStatistics1.toString(
-//                _HandleOutOfMemoryError));
-        Grids_GridStatistics a_Grid2DSquareCellDouble_GridStatistics0 = 
-                new Grids_GridStatistics(a_Grid2DSquareCellDouble);
-//        System.out.println("a_Grid2DSquareCellDouble_GridStatistics0 " + 
-//                a_Grid2DSquareCellDouble_GridStatistics0.toString(
-//                _HandleOutOfMemoryError));
+        Grids_GridDouble g;
+        g = (Grids_GridDouble) GridDoubleFactory.create(inputFile);
+        Grids_AbstractGridNumberStatistics gStatistics;
+        gStatistics = g.getStatistics(HandleOutOfMemoryError);
+        Grids_GridDoubleStatisticsNotUpdated statisticsNotUpdated
+                = (Grids_GridDoubleStatisticsNotUpdated) gStatistics;
+        Grids_GridDoubleStatistics gGridDoubleStatistics
+                = new Grids_GridDoubleStatistics(g);
 
         int numberOfDecimalPlaces_10 = 10;
         int numberOfDecimalPlaces_100 = 100;
         int scale_10 = 10;
 
-        BigDecimal mean_BigDecimal = 
-                a_Grid2DSquareCellDouble_GridStatistics1.getArithmeticMeanBigDecimal(
-                numberOfDecimalPlaces_10, _HandleOutOfMemoryError);
-        double min = a_Grid2DSquareCellDouble_GridStatistics1.getMinDouble(true, 
-                _HandleOutOfMemoryError);
+        BigDecimal mean;
+        mean = statisticsNotUpdated.getArithmeticMean(
+                HandleOutOfMemoryError);
+        double min = statisticsNotUpdated.getMin(true,
+                HandleOutOfMemoryError).doubleValue();
         System.out.println("min " + min);
         result[outputIndex] = min;
         outputIndex++;
-        double max = a_Grid2DSquareCellDouble_GridStatistics1.getMaxDouble(true, 
-                _HandleOutOfMemoryError);
+        double max = statisticsNotUpdated.getMax(true,
+                HandleOutOfMemoryError).doubleValue();
         System.out.println("max " + max);
         result[outputIndex] = max;
         outputIndex++;
-        System.out.println("mean " + mean_BigDecimal.toString());
-        result[outputIndex] = mean_BigDecimal.doubleValue();
+        System.out.println("mean " + mean.toString());
+        result[outputIndex] = mean.doubleValue();
         outputIndex++;
-        BigDecimal standardDeviation_BigDecimal = 
-                a_Grid2DSquareCellDouble_GridStatistics1.getStandardDeviationBigDecimal(
-                numberOfDecimalPlaces_10, _HandleOutOfMemoryError);
-        System.out.println("standard deviation " + 
-                standardDeviation_BigDecimal.toString());
-        result[outputIndex] = standardDeviation_BigDecimal.doubleValue();
+        BigDecimal standardDeviation;
+        standardDeviation = statisticsNotUpdated.getStandardDeviation(
+                HandleOutOfMemoryError);
+        System.out.println("standard deviation "
+                + standardDeviation.toString());
+        result[outputIndex] = standardDeviation.doubleValue();
         outputIndex++;
-        BigDecimal sum_BigDecimal = 
-                a_Grid2DSquareCellDouble_GridStatistics1.getSumBigDecimal(
-                _HandleOutOfMemoryError).setScale(scale_10, roundingMode);
-        System.out.println("sum " + sum_BigDecimal.toString());
-        result[outputIndex] = sum_BigDecimal.doubleValue();
+        BigDecimal sum;
+        sum = statisticsNotUpdated.getSum(HandleOutOfMemoryError).setScale(scale_10, roundingMode);
+        System.out.println("sum " + sum.toString());
+        result[outputIndex] = sum.doubleValue();
         outputIndex++;
-        System.out.println("number of non-NoDataValues " + 
-                a_Grid2DSquareCellDouble_GridStatistics1.getNonNoDataValueCountBigInteger(
-                _HandleOutOfMemoryError).toString());
-
+        System.out.println("number of non-NoDataValues "
+                + statisticsNotUpdated.getN(HandleOutOfMemoryError).toString());
         BigDecimal intervalRange_BigDecimal = new BigDecimal("" + intervalRange);
-        BigDecimal startIntervalBound_BigDecimal = 
-                new BigDecimal("" + startIntervalBound);
-
-        double noDataValue = 
-                a_Grid2DSquareCellDouble.getNoDataValue(_HandleOutOfMemoryError);
+        BigDecimal startIntervalBound_BigDecimal
+                = new BigDecimal("" + startIntervalBound);
+        double noDataValue
+                = g.getNoDataValue(HandleOutOfMemoryError);
         //System.out.println("NoDataValue " + noDataValue);
 
         long row;
         long col;
-        long a_Grid2DSquareCellDouble_NRows = 
-                a_Grid2DSquareCellDouble.getNRows(_HandleOutOfMemoryError);
-        long a_Grid2DSquareCellDouble_NCols = 
-                a_Grid2DSquareCellDouble.getNCols(_HandleOutOfMemoryError);
+        long a_Grid2DSquareCellDouble_NRows
+                = g.getNRows(HandleOutOfMemoryError);
+        long a_Grid2DSquareCellDouble_NCols
+                = g.getNCols(HandleOutOfMemoryError);
 //        HashMap<Double,Long> value_Grid2DSquareCellDoubleValue_HashMap = 
 //                new HashMap<Double,Long>();
 //        HashMap<Long,Long> interval_Grid2DSquareCellDoubleValue_HashMap = 
 //                new HashMap<Long,Long>();
-        TreeMap<Double, Long> value_Grid2DSquareCellDoubleValue_TreeMap = 
-                new TreeMap<Double, Long>();
-        TreeMap<Long, Long> interval_Grid2DSquareCellDoubleValue_TreeMap = 
-                new TreeMap<Long, Long>();
+        TreeMap<Double, Long> value_Grid2DSquareCellDoubleValue_TreeMap
+                = new TreeMap<Double, Long>();
+        TreeMap<Long, Long> interval_Grid2DSquareCellDoubleValue_TreeMap
+                = new TreeMap<Long, Long>();
 
         double cellValue;
         BigDecimal cellValue_BigDecimal;
@@ -459,8 +418,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
         BigDecimal sumIgnoringOne_BigDecimal = BigDecimal.ZERO;
         for (row = 0; row < a_Grid2DSquareCellDouble_NRows; row++) {
             for (col = 0; col < a_Grid2DSquareCellDouble_NCols; col++) {
-                cellValue = a_Grid2DSquareCellDouble.getCell(
-                        row, col, _HandleOutOfMemoryError);
+                cellValue = g.getCell(row, col, HandleOutOfMemoryError);
                 if (cellValue != noDataValue) {
                     if (cellValue == 1.0d) {
                         oneCounter++;
@@ -471,9 +429,9 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
                             n++;
                             cellValue_BigDecimal = new BigDecimal(
                                     Double.toString(cellValue));
-                            sumIgnoringOne_BigDecimal = 
-                                    sumIgnoringOne_BigDecimal.add(
-                                    cellValue_BigDecimal);
+                            sumIgnoringOne_BigDecimal
+                                    = sumIgnoringOne_BigDecimal.add(
+                                            cellValue_BigDecimal);
                             minIgnoringZeroAndOne = Math.min(
                                     minIgnoringZeroAndOne, cellValue);
                             maxIgnoringZeroAndOne = Math.max(
@@ -514,28 +472,28 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             result[outputIndex] = zeroCounter;
             outputIndex++;
             System.out.println(
-                    "min value ignoring values of 0 and 1 " + 
-                    minIgnoringZeroAndOne);
+                    "min value ignoring values of 0 and 1 "
+                    + minIgnoringZeroAndOne);
             result[outputIndex] = minIgnoringZeroAndOne;
             System.out.println(
-                    "max value ignoring values of 0 and 1 " + 
-                    maxIgnoringZeroAndOne);
+                    "max value ignoring values of 0 and 1 "
+                    + maxIgnoringZeroAndOne);
             outputIndex++;
             result[outputIndex] = maxIgnoringZeroAndOne;
             outputIndex++;
-            double rangeIgnoringZeroAndOne = maxIgnoringZeroAndOne - 
-                    minIgnoringZeroAndOne;
+            double rangeIgnoringZeroAndOne = maxIgnoringZeroAndOne
+                    - minIgnoringZeroAndOne;
             System.out.println(
-                    "range ignoring values of 0 and 1 " + 
-                    rangeIgnoringZeroAndOne);
+                    "range ignoring values of 0 and 1 "
+                    + rangeIgnoringZeroAndOne);
             result[outputIndex] = rangeIgnoringZeroAndOne;
             outputIndex++;
             BigDecimal n_BigDecimal = new BigDecimal(n);
-            BigDecimal meanIgnoringZeroAndOne_BigDecimal = 
-                    sumIgnoringOne_BigDecimal.divide(
-                    n_BigDecimal, scale_10, roundingMode);
-            System.out.println("mean ignoring values of 0 and 1 " + 
-                    meanIgnoringZeroAndOne_BigDecimal.doubleValue());
+            BigDecimal meanIgnoringZeroAndOne_BigDecimal
+                    = sumIgnoringOne_BigDecimal.divide(
+                            n_BigDecimal, scale_10, roundingMode);
+            System.out.println("mean ignoring values of 0 and 1 "
+                    + meanIgnoringZeroAndOne_BigDecimal.doubleValue());
             result[outputIndex] = meanIgnoringZeroAndOne_BigDecimal;
             outputIndex++;
 
@@ -639,8 +597,8 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
 
             // Skewness
             // Cyhelsky's skewness coefficient
-            double skewnessCyhelsky = 
-                    (numberOfValuesBelowMean - numberOfValuesAboveMean) / (double) n;
+            double skewnessCyhelsky
+                    = (numberOfValuesBelowMean - numberOfValuesAboveMean) / (double) n;
             System.out.println("skewnessCyhelsky " + skewnessCyhelsky);
             result[outputIndex] = skewnessCyhelsky;
             outputIndex++;
@@ -650,19 +608,19 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
                     numberOfDecimalPlaces_10,
                     roundingMode);
             BigDecimal skewnessDenominator = sqrt_moment2.multiply(moment2);
-            BigDecimal skewness = 
-                    moment3.divide(skewnessDenominator, 100, roundingMode);
-            System.out.println("skewness " + 
-                    skewness.setScale(scale_10, roundingMode));
+            BigDecimal skewness
+                    = moment3.divide(skewnessDenominator, 100, roundingMode);
+            System.out.println("skewness "
+                    + skewness.setScale(scale_10, roundingMode));
             result[outputIndex] = skewness.doubleValue();
             outputIndex++;
 
             BigDecimal kurtosisDenominatorPart = moment2.multiply(moment2);
-            BigDecimal kurtosis = 
-                    (moment4.divide(kurtosisDenominatorPart, 100, roundingMode))
-                    .subtract(new BigDecimal("3"));
-            System.out.println("kurtosis " + 
-                    kurtosis.setScale(scale_10, roundingMode));
+            BigDecimal kurtosis
+                    = (moment4.divide(kurtosisDenominatorPart, 100, roundingMode))
+                            .subtract(new BigDecimal("3"));
+            System.out.println("kurtosis "
+                    + kurtosis.setScale(scale_10, roundingMode));
             result[outputIndex] = kurtosis.doubleValue();
             outputIndex++;
             long variety = value_Grid2DSquareCellDoubleValue_TreeMap.size();
@@ -697,8 +655,8 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
                 BigDecimal divisor = new BigDecimal("" + mode_HashSet.size());
                 mode = modeSum.divide(divisor, 100, roundingMode);
             }
-            System.out.println("mode " + 
-                    mode.setScale(scale_10, roundingMode).toString());
+            System.out.println("mode "
+                    + mode.setScale(scale_10, roundingMode).toString());
             result[outputIndex] = mode.doubleValue();
             outputIndex++;
 
@@ -716,14 +674,14 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             BigDecimal maxOfInterval_BigDecimal;
 
             System.out.println("<Intervals with counts>");
-            Iterator<Long> b_Iterator = 
-                    interval_Grid2DSquareCellDoubleValue_TreeMap.keySet().iterator();
+            Iterator<Long> b_Iterator
+                    = interval_Grid2DSquareCellDoubleValue_TreeMap.keySet().iterator();
             while (b_Iterator.hasNext()) {
                 interval_ID = b_Iterator.next();
                 //minOfInterval = ((double) interval_ID * intervalRange) + startIntervalBound;
-                minOfInterval_BigDecimal = 
-                        (new BigDecimal(interval_ID).multiply(intervalRange_BigDecimal))
-                        .add(startIntervalBound_BigDecimal);
+                minOfInterval_BigDecimal
+                        = (new BigDecimal(interval_ID).multiply(intervalRange_BigDecimal))
+                                .add(startIntervalBound_BigDecimal);
                 //maxOfInterval = minOfInterval + intervalRange;
                 maxOfInterval_BigDecimal = minOfInterval_BigDecimal.add(intervalRange_BigDecimal);
                 count = (Long) interval_Grid2DSquareCellDoubleValue_TreeMap.get(interval_ID);
@@ -732,9 +690,9 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
 //                        " maxOfInterval " + maxOfInterval + 
 //                        " number of such values " + count);
                 System.out.println(
-                        "minOfInterval_BigDecimal " + minOfInterval_BigDecimal + 
-                        " maxOfInterval_BigDecimal " + maxOfInterval_BigDecimal + 
-                        " number of such values " + count);
+                        "minOfInterval_BigDecimal " + minOfInterval_BigDecimal
+                        + " maxOfInterval_BigDecimal " + maxOfInterval_BigDecimal
+                        + " number of such values " + count);
                 if (count > modeCount) {
                     modeCount = count;
                     modeInterval_HashSet = new HashSet<Long>();
@@ -791,36 +749,36 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
                 count = interval_Grid2DSquareCellDoubleValue_TreeMap.get(
                         interval_ID);
                 proportionOfClass = (double) count / (double) n;
-                sumProportionOfClassSquared += 
-                        proportionOfClass * proportionOfClass;
+                sumProportionOfClassSquared
+                        += proportionOfClass * proportionOfClass;
                 logProportionOfClass = Math.log(proportionOfClass);
                 //log10ProportionOfClass = Math.log10(proportionOfClass);
                 diversity -= proportionOfClass * logProportionOfClass;
                 //diversity -= proportionOfClass * log10ProportionOfClass;
-                evenSpread = (double) remainingSpread / 
-                        (double) intervalsRemaining;
+                evenSpread = (double) remainingSpread
+                        / (double) intervalsRemaining;
                 evenSpreadLong = (long) evenSpread;
                 remainingSpread -= evenSpreadLong;
                 intervalsRemaining--;
                 proportionOfClassMax = (double) evenSpreadLong / (double) n;
-                sumProportionOfClassMaxSquared += 
-                        proportionOfClassMax * proportionOfClassMax;
+                sumProportionOfClassMaxSquared
+                        += proportionOfClassMax * proportionOfClassMax;
                 logProportionOfClassMax = Math.log(proportionOfClassMax);
                 //log10ProportionOfClassMax = Math.log10(proportionOfClassMax);
                 //diversityMax = proportionOfClassMax * log10ProportionOfClassMax;
                 diversityMax -= proportionOfClassMax * logProportionOfClassMax;
             }
 
-            int numberOfIntervalsInRange = 
-                    (int) Math.ceil(rangeIgnoringZeroAndOne / intervalRange);
+            int numberOfIntervalsInRange
+                    = (int) Math.ceil(rangeIgnoringZeroAndOne / intervalRange);
             remainingSpread = n;
             intervalsRemaining = numberOfIntervalsInRange;
             double diversityMax2 = 0.0d;
             //double sumProportionOfClassMaxSquared2 = 0.0d;
             double logProportionOfClassMax2;
             for (int i = 0; i < numberOfIntervalsInRange; i++) {
-                evenSpread = 
-                        (double) remainingSpread / (double) intervalsRemaining;
+                evenSpread
+                        = (double) remainingSpread / (double) intervalsRemaining;
                 evenSpreadLong = (long) evenSpread;
                 remainingSpread -= evenSpreadLong;
                 intervalsRemaining--;
@@ -838,9 +796,9 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
 //            double intervalVarietyEvenness = 
 //                    (-100.0d * Math.Log(sumProportionOfClassSquared)) / 
 //                    Math.Log(intervalVariety);
-            double intervalVarietyEvenness = 
-                    (-100.0d * Math.log10(sumProportionOfClassSquared)) / 
-                    Math.log10(intervalVariety);
+            double intervalVarietyEvenness
+                    = (-100.0d * Math.log10(sumProportionOfClassSquared))
+                    / Math.log10(intervalVariety);
             System.out.println(
                     "intervalVarietyEvenness " + intervalVarietyEvenness);
             result[outputIndex] = intervalVarietyEvenness;
@@ -848,12 +806,12 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
 //            double numberOfIntervalsInRangeEvenness = 
 //                    (-100.0d * Math.Log(sumProportionOfClassSquared)) / 
 //                    Math.Log(numberOfIntervalsInRange);
-            double numberOfIntervalsInRangeEvenness = 
-                    (-100.0d * Math.log10(sumProportionOfClassSquared)) / 
-                    Math.log10(numberOfIntervalsInRange);
+            double numberOfIntervalsInRangeEvenness
+                    = (-100.0d * Math.log10(sumProportionOfClassSquared))
+                    / Math.log10(numberOfIntervalsInRange);
             System.out.println(
-                    "numberOfIntervalsInRangeEvenness " + 
-                    numberOfIntervalsInRangeEvenness);
+                    "numberOfIntervalsInRangeEvenness "
+                    + numberOfIntervalsInRangeEvenness);
             result[outputIndex] = numberOfIntervalsInRangeEvenness;
             outputIndex++;
             System.out.println(
@@ -865,8 +823,8 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             result[outputIndex] = dominance;
             outputIndex++;
             System.out.println(
-                    "maximumDiversityOverIntervalsInObservedRange " + 
-                    diversityMax2);
+                    "maximumDiversityOverIntervalsInObservedRange "
+                    + diversityMax2);
             result[outputIndex] = diversityMax2;
             outputIndex++;
             double dominance2 = diversityMax2 + diversity;
