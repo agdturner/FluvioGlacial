@@ -353,6 +353,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
 
         BigDecimal mean;
         mean = statisticsNotUpdated.getArithmeticMean(
+                numberOfDecimalPlaces_100,
                 HandleOutOfMemoryError);
         double min = statisticsNotUpdated.getMin(true,
                 HandleOutOfMemoryError).doubleValue();
@@ -369,6 +370,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
         outputIndex++;
         BigDecimal standardDeviation;
         standardDeviation = statisticsNotUpdated.getStandardDeviation(
+                numberOfDecimalPlaces_10,
                 HandleOutOfMemoryError);
         System.out.println("standard deviation "
                 + standardDeviation.toString());
