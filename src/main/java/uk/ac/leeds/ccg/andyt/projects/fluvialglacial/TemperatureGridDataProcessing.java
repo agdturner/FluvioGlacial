@@ -341,7 +341,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
         Grids_GridDouble g;
         g = (Grids_GridDouble) GridDoubleFactory.create(inputFile);
         Grids_AbstractGridNumberStatistics gStatistics;
-        gStatistics = g.getStatistics(HandleOutOfMemoryError);
+        gStatistics = g.getStats(HandleOutOfMemoryError);
         Grids_GridDoubleStatisticsNotUpdated statisticsNotUpdated
                 = (Grids_GridDoubleStatisticsNotUpdated) gStatistics;
         Grids_GridDoubleStatistics gGridDoubleStatistics
