@@ -26,11 +26,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.TreeMap;
 import uk.ac.leeds.ccg.andyt.generic.math.Generic_BigDecimal;
-import uk.ac.leeds.ccg.andyt.grids.core.grid.statistics.Grids_AbstractGridNumberStatistics;
+import uk.ac.leeds.ccg.andyt.grids.core.grid.stats.Grids_AbstractGridNumberStats;
 import uk.ac.leeds.ccg.andyt.grids.core.grid.Grids_GridDouble;
 import uk.ac.leeds.ccg.andyt.grids.core.Grids_Environment;
-import uk.ac.leeds.ccg.andyt.grids.core.grid.statistics.Grids_GridDoubleStatistics;
-import uk.ac.leeds.ccg.andyt.grids.core.grid.statistics.Grids_GridDoubleStatisticsNotUpdated;
+import uk.ac.leeds.ccg.andyt.grids.core.grid.stats.Grids_GridDoubleStats;
+import uk.ac.leeds.ccg.andyt.grids.core.grid.stats.Grids_GridDoubleStatsNotUpdated;
 import uk.ac.leeds.ccg.andyt.grids.io.Grids_ESRIAsciiGridExporter;
 import uk.ac.leeds.ccg.andyt.grids.io.Grids_ESRIAsciiGridImporter;
 import uk.ac.leeds.ccg.andyt.grids.process.Grids_ProcessorDEM;
@@ -340,12 +340,12 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
         int outputIndex = 0;
         Grids_GridDouble g;
         g = (Grids_GridDouble) GridDoubleFactory.create(inputFile);
-        Grids_AbstractGridNumberStatistics gStatistics;
+        Grids_AbstractGridNumberStats gStatistics;
         gStatistics = g.getStatistics(HandleOutOfMemoryError);
-        Grids_GridDoubleStatisticsNotUpdated statisticsNotUpdated
-                = (Grids_GridDoubleStatisticsNotUpdated) gStatistics;
-        Grids_GridDoubleStatistics gGridDoubleStatistics
-                = new Grids_GridDoubleStatistics(g);
+        Grids_GridDoubleStatsNotUpdated statisticsNotUpdated
+                = (Grids_GridDoubleStatsNotUpdated) gStatistics;
+        Grids_GridDoubleStats gGridDoubleStatistics
+                = new Grids_GridDoubleStats(g);
 
         int numberOfDecimalPlaces_10 = 10;
         int numberOfDecimalPlaces_100 = 100;
