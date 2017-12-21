@@ -26,11 +26,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.TreeMap;
 import uk.ac.leeds.ccg.andyt.generic.math.Generic_BigDecimal;
-import uk.ac.leeds.ccg.andyt.grids.core.grid.statistics.Grids_AbstractGridNumberStatistics;
+import uk.ac.leeds.ccg.andyt.grids.core.grid.stats.Grids_AbstractGridNumberStats;
 import uk.ac.leeds.ccg.andyt.grids.core.grid.Grids_GridDouble;
 import uk.ac.leeds.ccg.andyt.grids.core.Grids_Environment;
-import uk.ac.leeds.ccg.andyt.grids.core.grid.statistics.Grids_GridDoubleStatistics;
-import uk.ac.leeds.ccg.andyt.grids.core.grid.statistics.Grids_GridDoubleStatisticsNotUpdated;
+import uk.ac.leeds.ccg.andyt.grids.core.grid.stats.Grids_GridDoubleStats;
+import uk.ac.leeds.ccg.andyt.grids.core.grid.stats.Grids_GridDoubleStatsNotUpdated;
 import uk.ac.leeds.ccg.andyt.grids.io.Grids_ESRIAsciiGridExporter;
 import uk.ac.leeds.ccg.andyt.grids.io.Grids_ESRIAsciiGridImporter;
 import uk.ac.leeds.ccg.andyt.grids.process.Grids_ProcessorDEM;
@@ -87,7 +87,10 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
         } catch (Error e) {
             System.err.println(e.getLocalizedMessage());
             //e.printStackTrace();
-        } catch (Exception e) {
+        } catch (IOException e) {
+            System.err.println(e.getLocalizedMessage());
+            //e.printStackTrace();
+        } catch (IllegalArgumentException e) {
             System.err.println(e.getLocalizedMessage());
             //e.printStackTrace();
         }
@@ -340,28 +343,21 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
         int outputIndex = 0;
         Grids_GridDouble g;
         g = (Grids_GridDouble) GridDoubleFactory.create(inputFile);
-        Grids_AbstractGridNumberStatistics gStatistics;
+        Grids_AbstractGridNumberStats gStatistics;
         gStatistics = g.getStats(HandleOutOfMemoryError);
-        Grids_GridDoubleStatisticsNotUpdated statisticsNotUpdated
-                = (Grids_GridDoubleStatisticsNotUpdated) gStatistics;
-        Grids_GridDoubleStatistics gGridDoubleStatistics
-                = new Grids_GridDoubleStatistics(g);
-
-        int numberOfDecimalPlaces_10 = 10;
-        int numberOfDecimalPlaces_100 = 100;
-        int scale_10 = 10;
-
+        Grids_GridDoubleStatsNotUpdated stats
+                = (Grids_GridDoubleStatsNotUpdated) gStatistics;
+        Grids_GridDoubleStats gGridDoubleStatistics
+                = new Grids_GridDoubleStats(g);
+        int ten = 10;
+        int hundred = 100;
         BigDecimal mean;
-        mean = statisticsNotUpdated.getArithmeticMean(
-                numberOfDecimalPlaces_100,
-                HandleOutOfMemoryError);
-        double min = statisticsNotUpdated.getMin(true,
-                HandleOutOfMemoryError).doubleValue();
+        mean = stats.getArithmeticMean(hundred);
+        double min = stats.getMin(true);
         System.out.println("min " + min);
         result[outputIndex] = min;
         outputIndex++;
-        double max = statisticsNotUpdated.getMax(true,
-                HandleOutOfMemoryError).doubleValue();
+        double max = stats.getMax(true);
         System.out.println("max " + max);
         result[outputIndex] = max;
         outputIndex++;
@@ -369,92 +365,77 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
         result[outputIndex] = mean.doubleValue();
         outputIndex++;
         BigDecimal standardDeviation;
-        standardDeviation = statisticsNotUpdated.getStandardDeviation(
-                numberOfDecimalPlaces_10,
-                HandleOutOfMemoryError);
+        standardDeviation = stats.getStandardDeviation(ten);
         System.out.println("standard deviation "
                 + standardDeviation.toString());
         result[outputIndex] = standardDeviation.doubleValue();
         outputIndex++;
         BigDecimal sum;
-        sum = statisticsNotUpdated.getSum(HandleOutOfMemoryError).setScale(scale_10, roundingMode);
+        sum = stats.getSum().setScale(ten, roundingMode);
         System.out.println("sum " + sum.toString());
         result[outputIndex] = sum.doubleValue();
         outputIndex++;
-        System.out.println("number of non-NoDataValues "
-                + statisticsNotUpdated.getN(HandleOutOfMemoryError).toString());
-        BigDecimal intervalRange_BigDecimal = new BigDecimal("" + intervalRange);
-        BigDecimal startIntervalBound_BigDecimal
-                = new BigDecimal("" + startIntervalBound);
-        double noDataValue
-                = g.getNoDataValue(HandleOutOfMemoryError);
+        System.out.println("number of non-NoDataValues " + stats.getN());
+        BigDecimal intervalRangeBD = new BigDecimal("" + intervalRange);
+        BigDecimal startIntervalBoundBD = new BigDecimal("" + startIntervalBound);
+        double noDataValue = g.getNoDataValue();
         //System.out.println("NoDataValue " + noDataValue);
 
         long row;
         long col;
-        long a_Grid2DSquareCellDouble_NRows
-                = g.getNRows(HandleOutOfMemoryError);
-        long a_Grid2DSquareCellDouble_NCols
-                = g.getNCols(HandleOutOfMemoryError);
-//        HashMap<Double,Long> value_Grid2DSquareCellDoubleValue_HashMap = 
-//                new HashMap<Double,Long>();
-//        HashMap<Long,Long> interval_Grid2DSquareCellDoubleValue_HashMap = 
-//                new HashMap<Long,Long>();
-        TreeMap<Double, Long> value_Grid2DSquareCellDoubleValue_TreeMap
-                = new TreeMap<Double, Long>();
-        TreeMap<Long, Long> interval_Grid2DSquareCellDoubleValue_TreeMap
-                = new TreeMap<Long, Long>();
+        long nRows = g.getNRows();
+        long nCols = g.getNCols();
+        TreeMap<Double, Long> valueCountMap = new TreeMap<Double, Long>();
+        TreeMap<Long, Long> intervalCountMap = new TreeMap<Long, Long>();
 
-        double cellValue;
-        BigDecimal cellValue_BigDecimal;
+        double v;
+        BigDecimal vBD;
         long count;
         long interval_ID;
         long n = 0;
         int oneCounter = 0;
         int zeroCounter = 0;
         double minIgnoringZeroAndOne = Double.MAX_VALUE;
-        double maxIgnoringZeroAndOne = Double.MIN_VALUE;
+        double maxIgnoringZeroAndOne = -Double.MAX_VALUE;
 
         // Recalculate statistics ignoring zeros and ones and initialise
         // value and interval maps and
         BigDecimal sumIgnoringOne_BigDecimal = BigDecimal.ZERO;
-        for (row = 0; row < a_Grid2DSquareCellDouble_NRows; row++) {
-            for (col = 0; col < a_Grid2DSquareCellDouble_NCols; col++) {
-                cellValue = g.getCell(row, col, HandleOutOfMemoryError);
-                if (cellValue != noDataValue) {
-                    if (cellValue == 1.0d) {
+        for (row = 0; row < nRows; row++) {
+            for (col = 0; col < nCols; col++) {
+                v = g.getCell(row, col, HandleOutOfMemoryError);
+                if (v != noDataValue) {
+                    if (v == 1.0d) {
                         oneCounter++;
                     } else {
-                        if (cellValue == 0.0d) {
+                        if (v == 0.0d) {
                             zeroCounter++;
                         } else {
                             n++;
-                            cellValue_BigDecimal = new BigDecimal(
-                                    Double.toString(cellValue));
+                            vBD = new BigDecimal(                                    Double.toString(v));
                             sumIgnoringOne_BigDecimal
-                                    = sumIgnoringOne_BigDecimal.add(
-                                            cellValue_BigDecimal);
+                                    = sumIgnoringOne_BigDecimal.add(                                            vBD);
                             minIgnoringZeroAndOne = Math.min(
-                                    minIgnoringZeroAndOne, cellValue);
+                                    minIgnoringZeroAndOne, v);
                             maxIgnoringZeroAndOne = Math.max(
-                                    maxIgnoringZeroAndOne, cellValue);
-                            if (value_Grid2DSquareCellDoubleValue_TreeMap.containsKey(cellValue)) {
-                                count = (Long) value_Grid2DSquareCellDoubleValue_TreeMap.get(cellValue);
+                                    maxIgnoringZeroAndOne, v);
+                            if (valueCountMap.containsKey(v)) {
+                                count = valueCountMap.get(v);
                                 count++;
-                                value_Grid2DSquareCellDoubleValue_TreeMap.put(cellValue, count);
+                                valueCountMap.put(v, count);
                             } else {
-                                value_Grid2DSquareCellDoubleValue_TreeMap.put(cellValue, 1L);
+                                valueCountMap.put(v, 1L);
                             }
                             interval_ID = getInterval(
-                                    cellValue,
+                                    v,
                                     intervalRange,
                                     startIntervalBound);
-                            if (interval_Grid2DSquareCellDoubleValue_TreeMap.containsKey(interval_ID)) {
-                                count = (Long) interval_Grid2DSquareCellDoubleValue_TreeMap.get(interval_ID);
+                            if (intervalCountMap.containsKey(interval_ID)) {
+                                count = intervalCountMap.get(interval_ID);
                                 count++;
-                                interval_Grid2DSquareCellDoubleValue_TreeMap.put(interval_ID, count);
+                                intervalCountMap.put(interval_ID, count);
                             } else {
-                                interval_Grid2DSquareCellDoubleValue_TreeMap.put(interval_ID, 1L);
+                                intervalCountMap.put(interval_ID, 1L);
                             }
                         }
                     }
@@ -493,7 +474,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             BigDecimal n_BigDecimal = new BigDecimal(n);
             BigDecimal meanIgnoringZeroAndOne_BigDecimal
                     = sumIgnoringOne_BigDecimal.divide(
-                            n_BigDecimal, scale_10, roundingMode);
+                            n_BigDecimal, ten, roundingMode);
             System.out.println("mean ignoring values of 0 and 1 "
                     + meanIgnoringZeroAndOne_BigDecimal.doubleValue());
             result[outputIndex] = meanIgnoringZeroAndOne_BigDecimal;
@@ -529,20 +510,20 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             boolean upperQuartileUnset = true;
             long sumCount = 0L;
             System.out.println("<CellValues with counts>");
-            Iterator<Double> a_Iterator = value_Grid2DSquareCellDoubleValue_TreeMap.keySet().iterator();
+            Iterator<Double> a_Iterator = valueCountMap.keySet().iterator();
             while (a_Iterator.hasNext()) {
-                cellValue = a_Iterator.next();
-                count = (Long) value_Grid2DSquareCellDoubleValue_TreeMap.get(cellValue);
-                System.out.println("cellValue " + cellValue + " number of such values " + count);
-                cellValue_BigDecimal = new BigDecimal(cellValue);
-                if (cellValue_BigDecimal.compareTo(meanIgnoringZeroAndOne_BigDecimal) == -1) {
+                v = a_Iterator.next();
+                count = valueCountMap.get(v);
+                System.out.println("cellValue " + v + " number of such values " + count);
+                vBD = new BigDecimal(v);
+                if (vBD.compareTo(meanIgnoringZeroAndOne_BigDecimal) == -1) {
                     numberOfValuesBelowMean++;
                 } else {
-                    if (cellValue_BigDecimal.compareTo(meanIgnoringZeroAndOne_BigDecimal) == 1) {
+                    if (vBD.compareTo(meanIgnoringZeroAndOne_BigDecimal) == 1) {
                         numberOfValuesAboveMean++;
                     }
                 }
-                differenceFromMean = cellValue_BigDecimal.subtract(
+                differenceFromMean = vBD.subtract(
                         meanIgnoringZeroAndOne_BigDecimal);
                 for (int i = 0; i < count; i++) {
                     moment1 = moment1.add(differenceFromMean);
@@ -553,47 +534,47 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
                 sumCount += count;
                 if (lowerQuartileUnset) {
                     if (sumCount > lowerQuartileIndex_long) {
-                        lowerQuartile = cellValue;
+                        lowerQuartile = v;
                         lowerQuartileUnset = false;
                     }
                 }
                 if (medianUnset) {
                     if (sumCount > medianIndex_long) {
-                        median = cellValue;
+                        median = v;
                         medianUnset = false;
                     }
                 }
                 if (upperQuartileUnset) {
                     if (sumCount > upperQuartileIndex_long) {
-                        upperQuartile = cellValue;
+                        upperQuartile = v;
                         upperQuartileUnset = false;
                     }
                 }
                 if (count > modeCount) {
                     modeCount = count;
                     mode_HashSet = new HashSet<Double>();
-                    mode_HashSet.add(cellValue);
+                    mode_HashSet.add(v);
                 } else {
                     if (count == modeCount) {
-                        mode_HashSet.add(cellValue);
+                        mode_HashSet.add(v);
                     }
                 }
             }
             System.out.println("</CellValues with counts>");
-            moment1 = moment1.divide(n_BigDecimal, scale_10, roundingMode);
-            System.out.println("moment1 " + moment1.setScale(scale_10, roundingMode));
+            moment1 = moment1.divide(n_BigDecimal, ten, roundingMode);
+            System.out.println("moment1 " + moment1.setScale(ten, roundingMode));
             result[outputIndex] = moment1.doubleValue();
             outputIndex++;
-            moment2 = moment2.divide(n_BigDecimal, scale_10, roundingMode);
-            System.out.println("moment2 " + moment2.setScale(scale_10, roundingMode));
+            moment2 = moment2.divide(n_BigDecimal, ten, roundingMode);
+            System.out.println("moment2 " + moment2.setScale(ten, roundingMode));
             result[outputIndex] = moment2.doubleValue();
             outputIndex++;
-            moment3 = moment3.divide(n_BigDecimal, scale_10, roundingMode);
-            System.out.println("moment3 " + moment3.setScale(scale_10, roundingMode));
+            moment3 = moment3.divide(n_BigDecimal, ten, roundingMode);
+            System.out.println("moment3 " + moment3.setScale(ten, roundingMode));
             result[outputIndex] = moment3.doubleValue();
             outputIndex++;
-            moment4 = moment4.divide(n_BigDecimal, scale_10, roundingMode);
-            System.out.println("moment4 " + moment4.setScale(scale_10, roundingMode));
+            moment4 = moment4.divide(n_BigDecimal, ten, roundingMode);
+            System.out.println("moment4 " + moment4.setScale(ten, roundingMode));
             result[outputIndex] = moment4.doubleValue();
             outputIndex++;
 
@@ -607,13 +588,13 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             BigDecimal sqrt_moment2 = Generic_BigDecimal.power(
                     moment2,
                     Generic_BigDecimal.HALF,
-                    numberOfDecimalPlaces_10,
+                    ten,
                     roundingMode);
             BigDecimal skewnessDenominator = sqrt_moment2.multiply(moment2);
             BigDecimal skewness
                     = moment3.divide(skewnessDenominator, 100, roundingMode);
             System.out.println("skewness "
-                    + skewness.setScale(scale_10, roundingMode));
+                    + skewness.setScale(ten, roundingMode));
             result[outputIndex] = skewness.doubleValue();
             outputIndex++;
 
@@ -622,10 +603,10 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
                     = (moment4.divide(kurtosisDenominatorPart, 100, roundingMode))
                             .subtract(new BigDecimal("3"));
             System.out.println("kurtosis "
-                    + kurtosis.setScale(scale_10, roundingMode));
+                    + kurtosis.setScale(ten, roundingMode));
             result[outputIndex] = kurtosis.doubleValue();
             outputIndex++;
-            long variety = value_Grid2DSquareCellDoubleValue_TreeMap.size();
+            long variety = valueCountMap.size();
             System.out.println("number of different values " + variety);
             result[outputIndex] = variety;
             outputIndex++;
@@ -658,12 +639,12 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
                 mode = modeSum.divide(divisor, 100, roundingMode);
             }
             System.out.println("mode "
-                    + mode.setScale(scale_10, roundingMode).toString());
+                    + mode.setScale(ten, roundingMode).toString());
             result[outputIndex] = mode.doubleValue();
             outputIndex++;
 
             // Find mode interval
-            int intervalVariety = interval_Grid2DSquareCellDoubleValue_TreeMap.size();
+            int intervalVariety = intervalCountMap.size();
             System.out.println("number of different intervals with values " + intervalVariety);
             result[outputIndex] = intervalVariety;
             outputIndex++;
@@ -677,16 +658,16 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
 
             System.out.println("<Intervals with counts>");
             Iterator<Long> b_Iterator
-                    = interval_Grid2DSquareCellDoubleValue_TreeMap.keySet().iterator();
+                    = intervalCountMap.keySet().iterator();
             while (b_Iterator.hasNext()) {
                 interval_ID = b_Iterator.next();
                 //minOfInterval = ((double) interval_ID * intervalRange) + startIntervalBound;
                 minOfInterval_BigDecimal
-                        = (new BigDecimal(interval_ID).multiply(intervalRange_BigDecimal))
-                                .add(startIntervalBound_BigDecimal);
+                        = (new BigDecimal(interval_ID).multiply(intervalRangeBD))
+                                .add(startIntervalBoundBD);
                 //maxOfInterval = minOfInterval + intervalRange;
-                maxOfInterval_BigDecimal = minOfInterval_BigDecimal.add(intervalRange_BigDecimal);
-                count = (Long) interval_Grid2DSquareCellDoubleValue_TreeMap.get(interval_ID);
+                maxOfInterval_BigDecimal = minOfInterval_BigDecimal.add(intervalRangeBD);
+                count = intervalCountMap.get(interval_ID);
 //                System.out.println(
 //                        "minOfInterval " + minOfInterval + 
 //                        " maxOfInterval " + maxOfInterval + 
@@ -724,7 +705,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
                 BigDecimal divisor = new BigDecimal(
                         "" + modeInterval_HashSet.size());
                 modeInterval = modeIntervalSum.divide(
-                        divisor, numberOfDecimalPlaces_10, roundingMode);
+                        divisor, ten, roundingMode);
             }
             System.out.println("modeInterval " + modeInterval.toString());
             // Mean of the values in the mode intervals might be a better than 
@@ -745,10 +726,10 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             long evenSpreadLong;
             long intervalsRemaining = intervalVariety;
             long remainingSpread = n;
-            b_Iterator = interval_Grid2DSquareCellDoubleValue_TreeMap.keySet().iterator();
+            b_Iterator = intervalCountMap.keySet().iterator();
             while (b_Iterator.hasNext()) {
                 interval_ID = b_Iterator.next();
-                count = interval_Grid2DSquareCellDoubleValue_TreeMap.get(
+                count = intervalCountMap.get(
                         interval_ID);
                 proportionOfClass = (double) count / (double) n;
                 sumProportionOfClassSquared
