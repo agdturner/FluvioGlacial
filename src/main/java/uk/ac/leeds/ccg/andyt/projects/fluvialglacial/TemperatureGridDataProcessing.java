@@ -111,7 +111,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             double startIntervalBound) {
         String month = "August";
         File inputDirectory = new File(
-                getDirectory(HandleOutOfMemoryError).getAbsolutePath() + "/input/" + month + "/");
+                getDirectory().getAbsolutePath() + "/input/" + month + "/");
         File outputDirectory = getOutputFile(
                 intervalRange, startIntervalBound, month);
         File inputFile = new File(inputDirectory, "27t1700.txt");
@@ -127,7 +127,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             double startIntervalBound,
             String month) {
         return new File(
-                getDirectory(HandleOutOfMemoryError).getAbsolutePath() + "/output/"
+                getDirectory().getAbsolutePath() + "/output/"
                 + intervalRange + "_" + startIntervalBound + "/" + month + "/");
     }
 
@@ -137,7 +137,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             throws IOException {
         String month = "July";
         File inputDirectory = new File(
-                getDirectory(HandleOutOfMemoryError).getAbsolutePath() + "/input/" + month);
+                getDirectory().getAbsolutePath() + "/input/" + month);
         File outputDirectory = getOutputFile(
                 intervalRange, startIntervalBound, month);
         outputDirectory.mkdirs();
@@ -221,7 +221,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             throws IOException {
         String month = "August";
         File inputDirectory = new File(
-                getDirectory(HandleOutOfMemoryError).getAbsolutePath() + "/input/" + month);
+                getDirectory().getAbsolutePath() + "/input/" + month);
         File outputDirectory = getOutputFile(
                 intervalRange, startIntervalBound, month);
         outputDirectory.mkdirs();
@@ -403,7 +403,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
         BigDecimal sumIgnoringOne_BigDecimal = BigDecimal.ZERO;
         for (row = 0; row < nRows; row++) {
             for (col = 0; col < nCols; col++) {
-                v = g.getCell(row, col, HandleOutOfMemoryError);
+                v = g.getCell(row, col);
                 if (v != noDataValue) {
                     if (v == 1.0d) {
                         oneCounter++;
@@ -412,9 +412,9 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
                             zeroCounter++;
                         } else {
                             n++;
-                            vBD = new BigDecimal(                                    Double.toString(v));
+                            vBD = new BigDecimal(Double.toString(v));
                             sumIgnoringOne_BigDecimal
-                                    = sumIgnoringOne_BigDecimal.add(                                            vBD);
+                                    = sumIgnoringOne_BigDecimal.add(vBD);
                             minIgnoringZeroAndOne = Math.min(
                                     minIgnoringZeroAndOne, v);
                             maxIgnoringZeroAndOne = Math.max(
