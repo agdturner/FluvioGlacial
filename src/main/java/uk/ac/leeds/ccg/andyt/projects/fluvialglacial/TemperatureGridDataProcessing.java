@@ -29,7 +29,6 @@ import uk.ac.leeds.ccg.andyt.generic.math.Generic_BigDecimal;
 import uk.ac.leeds.ccg.andyt.grids.core.grid.stats.Grids_AbstractGridNumberStats;
 import uk.ac.leeds.ccg.andyt.grids.core.grid.Grids_GridDouble;
 import uk.ac.leeds.ccg.andyt.grids.core.Grids_Environment;
-import uk.ac.leeds.ccg.andyt.grids.core.grid.stats.Grids_GridDoubleStats;
 import uk.ac.leeds.ccg.andyt.grids.core.grid.stats.Grids_GridDoubleStatsNotUpdated;
 import uk.ac.leeds.ccg.andyt.grids.io.Grids_ESRIAsciiGridExporter;
 import uk.ac.leeds.ccg.andyt.grids.io.Grids_ESRIAsciiGridImporter;
@@ -40,12 +39,11 @@ import uk.ac.leeds.ccg.andyt.grids.process.Grids_ProcessorDEM;
  */
 public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
 
-    Grids_ESRIAsciiGridImporter _ESRIAsciiGridImporter;
+    Grids_ESRIAsciiGridImporter ESRIAsciiGridImporter;
     boolean HandleOutOfMemoryError;
-    String _FileSeparator;
-    //ImageExporter _ImageExporter;
-    String[] _ImageTypes;
-    Grids_ESRIAsciiGridExporter _ESRIAsciiGridExporter;
+    String FileSeparator;
+    String[] ImageTypes;
+    Grids_ESRIAsciiGridExporter ESRIAsciiGridExporter;
 
     protected TemperatureGridDataProcessing() {
     }
@@ -341,14 +339,15 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
         int numberOfOutputs = 32;
         Object[] result = new Object[numberOfOutputs];
         int outputIndex = 0;
+        File dirGen;
+        dirGen = new File(ge.getDirectory(), "generated");
+        File dir = new File(ge.getFiles().getGeneratedGridDoubleDir(), inputFile.getName());
         Grids_GridDouble g;
-        g = (Grids_GridDouble) GridDoubleFactory.create(inputFile);
+        g = (Grids_GridDouble) GridDoubleFactory.create(dir, inputFile);
         Grids_AbstractGridNumberStats gStatistics;
         gStatistics = g.getStats(HandleOutOfMemoryError);
-        Grids_GridDoubleStatsNotUpdated stats
-                = (Grids_GridDoubleStatsNotUpdated) gStatistics;
-        Grids_GridDoubleStats gGridDoubleStatistics
-                = new Grids_GridDoubleStats(g);
+        Grids_GridDoubleStatsNotUpdated stats;
+        stats = (Grids_GridDoubleStatsNotUpdated) gStatistics;
         int ten = 10;
         int hundred = 100;
         BigDecimal mean;
