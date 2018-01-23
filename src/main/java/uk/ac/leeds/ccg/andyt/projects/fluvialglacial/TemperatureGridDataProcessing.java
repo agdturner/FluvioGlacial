@@ -33,12 +33,14 @@ import uk.ac.leeds.ccg.andyt.grids.core.grid.stats.Grids_GridDoubleStatsNotUpdat
 import uk.ac.leeds.ccg.andyt.grids.io.Grids_ESRIAsciiGridExporter;
 import uk.ac.leeds.ccg.andyt.grids.io.Grids_ESRIAsciiGridImporter;
 import uk.ac.leeds.ccg.andyt.grids.process.Grids_ProcessorDEM;
+import uk.ac.leeds.ccg.andyt.projects.fluvialglacial.core.FG_Strings;
 
 /**
  * A class developed for processing stream temperature data.
  */
 public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
 
+    protected final FG_Strings Strings;
     Grids_ESRIAsciiGridImporter ESRIAsciiGridImporter;
     boolean HandleOutOfMemoryError;
     String FileSeparator;
@@ -46,10 +48,12 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
     Grids_ESRIAsciiGridExporter ESRIAsciiGridExporter;
 
     protected TemperatureGridDataProcessing() {
+        Strings = new FG_Strings();
     }
 
     public TemperatureGridDataProcessing(Grids_Environment ge) {
         super(ge);
+        Strings = new FG_Strings();
     }
 
     /**
@@ -104,28 +108,16 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
         runAugust(intervalRange, startIntervalBound);
     }
 
-    public void runTest(
-            double intervalRange,
-            double startIntervalBound) {
+    public void runTest(double intervalRange, double startIntervalBound) {
         String month = "August";
-        File inputDirectory = new File(
-                getDirectory().getAbsolutePath() + "/input/" + month + "/");
-        File outputDirectory = getOutputFile(
-                intervalRange, startIntervalBound, month);
-        File inputFile = new File(inputDirectory, "27t1700.txt");
-        getStatistics(
-                inputFile,
-                intervalRange,
-                startIntervalBound,
-                outputDirectory);
+        File inDir = new File(Files.getInputDataDir(Strings).getAbsolutePath() + month + "/");
+        File outDir = getOutputFile(intervalRange, startIntervalBound, month);
+        File inputFile = new File(inDir, "27t1700.txt");
+        getStatistics(inputFile, intervalRange, startIntervalBound, outDir);
     }
 
-    public File getOutputFile(
-            double intervalRange,
-            double startIntervalBound,
-            String month) {
-        return new File(
-                getDirectory().getAbsolutePath() + "/output/"
+    public File getOutputFile(double intervalRange, double startIntervalBound, String month) {
+        return new File(Files.getOutputDataDir(Strings).getAbsolutePath()
                 + intervalRange + "_" + startIntervalBound + "/" + month + "/");
     }
 
@@ -134,8 +126,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             double startIntervalBound)
             throws IOException {
         String month = "July";
-        File inputDirectory = new File(
-                getDirectory().getAbsolutePath() + "/input/" + month);
+        File inputDirectory = new File(Files.getInputDataDir(Strings).getAbsolutePath() + month);
         File outputDirectory = getOutputFile(
                 intervalRange, startIntervalBound, month);
         outputDirectory.mkdirs();
@@ -218,8 +209,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             double startIntervalBound)
             throws IOException {
         String month = "August";
-        File inputDirectory = new File(
-                getDirectory().getAbsolutePath() + "/input/" + month);
+        File inputDirectory = new File(Files.getInputDataDir(Strings).getAbsolutePath() + month);
         File outputDirectory = getOutputFile(
                 intervalRange, startIntervalBound, month);
         outputDirectory.mkdirs();
