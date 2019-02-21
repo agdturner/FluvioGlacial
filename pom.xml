@@ -2,22 +2,22 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>uk.ac.leeds.ccg.andyt</groupId>
-    <artifactId>agdt-landscape</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <artifactId>agdt-project-FluvioGlacial</artifactId>
+    <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>agdt-landscape</name>
-    <url>https://github.com/agdturner/agdt-landscape</url>
-    <description>A Java Library for processing landscape data.</description>
+    <name>agdt-project-FluvioGlacial</name>
+    <url>https://github.com/agdturner/agdt-project-FluvioGlacial</url>
+    <description>A Java Library for processing fluvioglacial landscape data.</description>
     <scm>
-        <url>git@github.com:agdturner/agdt-landscape.git</url>
-        <connection>scm:git:git@github.com:agdturner/agdt-landscape.git</connection>
-        <developerConnection>scm:git:git@github.com:agdturner/agdt-landscape</developerConnection>
+        <url>git@github.com:agdturner/agdt-project-FluvioGlacial.git</url>
+        <connection>scm:git:git@github.com:agdturner/agdt-project-FluvioGlacial.git</connection>
+        <developerConnection>scm:git:git@github.com:agdturner/agdt-project-FluvioGlacial</developerConnection>
     </scm>
     <licenses>
         <license>
             <name>Apache License 2.0</name>
-            <url>https://github.com/agdturner/agdt-landscape/LICENSE.txt</url>
+            <url>https://github.com/agdturner/agdt-project-FluvioGlacial/LICENSE.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -51,12 +51,14 @@
         <geotools.version>12.0.1</geotools.version>
         <geotools.version>12.1</geotools.version>
         -->
-        <agdt-geotools.version>0.1.0-SNAPSHOT</agdt-geotools.version>
-        <agdt-generic.version>1.0-SNAPSHOT</agdt-generic.version>
-        <agdt-grids.version>1.0-SNAPSHOT</agdt-grids.version>
-        <agdt-vector.version>1.0-SNAPSHOT</agdt-vector.version>
-        <agdt-data.version>0.1-SNAPSHOT</agdt-data.version>
-        <agdt-chart.version>0.1-SNAPSHOT</agdt-chart.version>
+        <agdt-java-generic-geotools.version>1.0-SNAPSHOT</agdt-java-generic-geotools.version>
+        <agdt-java-generic.version>1.0-SNAPSHOT</agdt-java-generic.version>
+        <agdt-java-generic-grids.version>1.0-SNAPSHOT</agdt-java-generic-grids.version>
+        <agdt-java-generic-vector.version>1.0-SNAPSHOT</agdt-java-generic-vector.version>
+        <agdt-java-generic-data.version>1.0-SNAPSHOT</agdt-java-generic-data.version>
+        <agdt-java-generic-chart.version>1.0-SNAPSHOT</agdt-java-generic-chart.version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -68,9 +70,10 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
+            <version>4.12</version>
             <scope>test</scope>
         </dependency>
+        <!--
         <dependency>
             <groupId>com.vividsolutions</groupId>
             <artifactId>jts</artifactId>
@@ -121,41 +124,42 @@
             <artifactId>gt-arcgrid</artifactId>
             <version>${geotools.version}</version>
         </dependency>
+        -->
         <dependency>
             <groupId>uk.ac.leeds.ccg.andyt</groupId>
-            <artifactId>agdt-geotools</artifactId>
-            <version>${agdt-geotools.version}</version>
+            <artifactId>agdt-java-generic-geotools</artifactId>
+            <version>${agdt-java-generic-geotools.version}</version>
         </dependency>
         <dependency>
             <groupId>uk.ac.leeds.ccg.andyt</groupId>
-            <artifactId>agdt-generic</artifactId>
-            <version>${agdt-generic.version}</version>
+            <artifactId>agdt-java-generic</artifactId>
+            <version>${agdt-java-generic.version}</version>
         </dependency>
         <dependency>
             <groupId>uk.ac.leeds.ccg.andyt</groupId>
-            <artifactId>agdt-grids</artifactId>
-            <version>${agdt-grids.version}</version>
+            <artifactId>agdt-java-generic-grids</artifactId>
+            <version>${agdt-java-generic-grids.version}</version>
         </dependency>
         <dependency>
             <groupId>uk.ac.leeds.ccg.andyt</groupId>
-            <artifactId>agdt-vector</artifactId>
-            <version>${agdt-vector.version}</version>
+            <artifactId>agdt-java-generic-vector</artifactId>
+            <version>${agdt-java-generic-vector.version}</version>
         </dependency>
         <dependency>
             <groupId>uk.ac.leeds.ccg.andyt</groupId>
-            <artifactId>agdt-data</artifactId>
-            <version>${agdt-data.version}</version>
+            <artifactId>agdt-java-generic-data</artifactId>
+            <version>${agdt-java-generic-data.version}</version>
         </dependency>
         <dependency>
             <groupId>uk.ac.leeds.ccg.andyt</groupId>
-            <artifactId>agdt-chart</artifactId>
-            <version>${agdt-chart.version}</version>
+            <artifactId>agdt-java-generic-chart</artifactId>
+            <version>${agdt-java-generic-chart.version}</version>
         </dependency>
     </dependencies>
     
     <repositories>
         <repository>
-            <id>generic</id>
+            <id>agdt-generic</id>
             <name>GitHub agdturner agdt-generic Repository</name>
             <url>https://github.com/agdturner/agdt-generic</url>
         </repository>
@@ -165,12 +169,12 @@
             <url>https://github.com/agdturner/agdt-geotools</url>
         </repository>
         <repository>
-            <id>grids</id>
+            <id>agdt-grids</id>
             <name>GitHub agdturner agdt-grids Repository</name>
             <url>https://github.com/agdturner/agdt-grids</url>
         </repository>
         <repository>
-            <id>vector</id>
+            <id>agdt-vector</id>
             <name>GitHub agdturner agdt-vector Repository</name>
             <url>https://github.com/agdturner/agdt-vector</url>
         </repository>
@@ -184,11 +188,13 @@
             <name>GitHub agdturner agdt-chart Repository</name>
             <url>https://github.com/agdturner/agdt-chart</url>
         </repository>
+        <!--
         <repository>
             <id>osgeo</id>
             <name>Open Source Geospatial Foundation Repository</name>
             <url>http://download.osgeo.org/webdav/geotools/</url>
         </repository>
+        -->
         <!--Add the snapshot repository here-->
         <!--
         <repository> 
