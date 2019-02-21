@@ -25,7 +25,7 @@ import java.math.RoundingMode;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.TreeMap;
-import uk.ac.leeds.ccg.andyt.math.Generic_BigDecimal;
+import uk.ac.leeds.ccg.andyt.math.Math_BigDecimal;
 import uk.ac.leeds.ccg.andyt.grids.core.grid.stats.Grids_AbstractGridNumberStats;
 import uk.ac.leeds.ccg.andyt.grids.core.grid.Grids_GridDouble;
 import uk.ac.leeds.ccg.andyt.grids.core.Grids_Environment;
@@ -110,14 +110,14 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
 
     public void runTest(double intervalRange, double startIntervalBound) {
         String month = "August";
-        File inDir = new File(Files.getInputDataDir(Strings).getAbsolutePath() + month + "/");
+        File inDir = new File(Files.getInputDataDir().getAbsolutePath() + month + "/");
         File outDir = getOutputFile(intervalRange, startIntervalBound, month);
         File inputFile = new File(inDir, "27t1700.txt");
         getStatistics(inputFile, intervalRange, startIntervalBound, outDir);
     }
 
     public File getOutputFile(double intervalRange, double startIntervalBound, String month) {
-        return new File(Files.getOutputDataDir(Strings).getAbsolutePath()
+        return new File(Files.getOutputDataDir().getAbsolutePath()
                 + intervalRange + "_" + startIntervalBound + "/" + month + "/");
     }
 
@@ -126,7 +126,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             double startIntervalBound)
             throws IOException {
         String month = "July";
-        File inputDirectory = new File(Files.getInputDataDir(Strings).getAbsolutePath() + month);
+        File inputDirectory = new File(Files.getInputDataDir().getAbsolutePath() + month);
         File outputDirectory = getOutputFile(
                 intervalRange, startIntervalBound, month);
         outputDirectory.mkdirs();
@@ -209,7 +209,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             double startIntervalBound)
             throws IOException {
         String month = "August";
-        File inputDirectory = new File(Files.getInputDataDir(Strings).getAbsolutePath() + month);
+        File inputDirectory = new File(Files.getInputDataDir().getAbsolutePath() + month);
         File outputDirectory = getOutputFile(
                 intervalRange, startIntervalBound, month);
         outputDirectory.mkdirs();
@@ -574,9 +574,9 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             System.out.println("skewnessCyhelsky " + skewnessCyhelsky);
             result[outputIndex] = skewnessCyhelsky;
             outputIndex++;
-            BigDecimal sqrt_moment2 = Generic_BigDecimal.power(
+            BigDecimal sqrt_moment2 = Math_BigDecimal.power(
                     moment2,
-                    Generic_BigDecimal.HALF,
+                    Math_BigDecimal.HALF,
                     ten,
                     roundingMode);
             BigDecimal skewnessDenominator = sqrt_moment2.multiply(moment2);

@@ -22,10 +22,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 //import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 import org.apache.commons.math.analysis.polynomials.PolynomialSplineFunction;
-import uk.ac.leeds.ccg.andyt.data.Generic_XYNumericalData;
+import uk.ac.leeds.ccg.andyt.data.Data_BiNumeric;
 import uk.ac.leeds.ccg.andyt.generic.io.Generic_IO;
-import uk.ac.leeds.ccg.andyt.math.Generic_BigDecimal;
-import uk.ac.leeds.ccg.andyt.chart.Generic_ScatterPlot;
+import uk.ac.leeds.ccg.andyt.math.Math_BigDecimal;
+import uk.ac.leeds.ccg.andyt.chart.examples.Chart_Scatter;
 
 /**
  *
@@ -147,8 +147,8 @@ public class SlopeAreaAnalysis {
             //if (ID == 388) {
 
             data = allData.get(ID);
-            ArrayList<Generic_XYNumericalData> theGeneric_XYNumericalData;
-            theGeneric_XYNumericalData = (ArrayList<Generic_XYNumericalData>) data[0];
+            ArrayList<Data_BiNumeric> theGeneric_XYNumericalData;
+            theGeneric_XYNumericalData = (ArrayList<Data_BiNumeric>) data[0];
             int np;
             np = theGeneric_XYNumericalData.size();
             for (int degree = 2; degree < 3; degree++) {
@@ -230,10 +230,10 @@ public class SlopeAreaAnalysis {
                             BigDecimal minx;
                             BigDecimal miny;
                             data = result.get(ID);
-                            ArrayList<Generic_XYNumericalData> theGeneric_XYNumericalData;
+                            ArrayList<Data_BiNumeric> theGeneric_XYNumericalData;
                             if (data == null) {
                                 data = new Object[5];
-                                theGeneric_XYNumericalData = new ArrayList<Generic_XYNumericalData>();
+                                theGeneric_XYNumericalData = new ArrayList<>();
                                 maxx = BigDecimal.ZERO;
                                 maxy = BigDecimal.ZERO;
                                 minx = BigDecimal.valueOf(Double.MAX_VALUE);
@@ -245,7 +245,7 @@ public class SlopeAreaAnalysis {
                                 data[4] = miny;
                                 result.put(ID, data);
                             } else {
-                                theGeneric_XYNumericalData = (ArrayList<Generic_XYNumericalData>) data[0];
+                                theGeneric_XYNumericalData = (ArrayList<Data_BiNumeric>) data[0];
                                 maxx = (BigDecimal) data[1];
                                 minx = (BigDecimal) data[2];
                                 maxy = (BigDecimal) data[3];
@@ -255,20 +255,18 @@ public class SlopeAreaAnalysis {
                             //flowacc = new BigDecimal(fields[0]);
                             area = new BigDecimal(fields[1]);
                             if (area.compareTo(BigDecimal.ZERO) == 1) {
-                                area = Generic_BigDecimal.log(10, area, 10, RoundingMode.HALF_UP);
+                                area = Math_BigDecimal.log(10, area, 10, RoundingMode.HALF_UP);
                             } else {
                                 area = BigDecimal.ZERO;
                             }
                             slope = new BigDecimal(fields[2]);
                             if (slope.compareTo(BigDecimal.ZERO) == 1) {
-                                slope = Generic_BigDecimal.log(10, slope, 10, RoundingMode.HALF_UP);
+                                slope = Math_BigDecimal.log(10, slope, 10, RoundingMode.HALF_UP);
                             } else {
                                 slope = BigDecimal.ZERO;
                             }
-                            Generic_XYNumericalData point;
-                            point = new Generic_XYNumericalData(
-                                    slope,
-                                    area);
+                            Data_BiNumeric point;
+                            point = new Data_BiNumeric(                                    slope,                                    area);
                             theGeneric_XYNumericalData.add(point);
                             data[0] = theGeneric_XYNumericalData;
                             data[1] = maxx.max(slope);
@@ -325,10 +323,10 @@ public class SlopeAreaAnalysis {
                             BigDecimal minx;
                             BigDecimal miny;
                             data = result.get(ID);
-                            ArrayList<Generic_XYNumericalData> theGeneric_XYNumericalData;
+                            ArrayList<Data_BiNumeric> theGeneric_XYNumericalData;
                             if (data == null) {
                                 data = new Object[5];
-                                theGeneric_XYNumericalData = new ArrayList<Generic_XYNumericalData>();
+                                theGeneric_XYNumericalData = new ArrayList<>();
                                 maxx = BigDecimal.ZERO;
                                 maxy = BigDecimal.ZERO;
                                 minx = BigDecimal.valueOf(Double.MAX_VALUE);
@@ -340,7 +338,7 @@ public class SlopeAreaAnalysis {
                                 data[4] = miny;
                                 result.put(ID, data);
                             } else {
-                                theGeneric_XYNumericalData = (ArrayList<Generic_XYNumericalData>) data[0];
+                                theGeneric_XYNumericalData = (ArrayList<Data_BiNumeric>) data[0];
                                 maxx = (BigDecimal) data[1];
                                 minx = (BigDecimal) data[2];
                                 maxy = (BigDecimal) data[3];
@@ -350,20 +348,18 @@ public class SlopeAreaAnalysis {
                             //flowacc = new BigDecimal(fields[0]);
                             area = new BigDecimal(fields[3]);
                             if (area.compareTo(BigDecimal.ZERO) == 1) {
-                                area = Generic_BigDecimal.log(10, area, 10, RoundingMode.HALF_UP);
+                                area = Math_BigDecimal.log(10, area, 10, RoundingMode.HALF_UP);
                             } else {
                                 area = BigDecimal.ZERO;
                             }
                             slope = new BigDecimal(fields[2]);
                             if (slope.compareTo(BigDecimal.ZERO) == 1) {
-                                slope = Generic_BigDecimal.log(10, slope, 10, RoundingMode.HALF_UP);
+                                slope = Math_BigDecimal.log(10, slope, 10, RoundingMode.HALF_UP);
                             } else {
                                 slope = BigDecimal.ZERO;
                             }
-                            Generic_XYNumericalData point;
-                            point = new Generic_XYNumericalData(
-                                    slope,
-                                    area);
+                            Data_BiNumeric point;
+                            point = new Data_BiNumeric(                                    slope,                                    area);
                             theGeneric_XYNumericalData.add(point);
                             data[0] = theGeneric_XYNumericalData;
                             data[1] = maxx.max(slope);
@@ -389,8 +385,8 @@ public class SlopeAreaAnalysis {
         ite = allData.keySet().iterator();
         int ID;
         Object[] data;
-        ArrayList<Generic_XYNumericalData> theGeneric_XYNumericalData;
-        Generic_XYNumericalData point;
+        ArrayList<Data_BiNumeric> theGeneric_XYNumericalData;
+        Data_BiNumeric point;
         BigDecimal maxx;
         BigDecimal minx;
         BigDecimal maxy;
@@ -399,7 +395,7 @@ public class SlopeAreaAnalysis {
         while (ite.hasNext()) {
             ID = ite.next();
             data = allData.get(ID);
-            theGeneric_XYNumericalData = (ArrayList<Generic_XYNumericalData>) data[0];
+            theGeneric_XYNumericalData = (ArrayList<Data_BiNumeric>) data[0];
             maxx = (BigDecimal) data[1];
             minx = (BigDecimal) data[2];
             maxy = (BigDecimal) data[3];

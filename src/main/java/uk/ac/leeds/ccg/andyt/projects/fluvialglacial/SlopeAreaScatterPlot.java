@@ -8,28 +8,25 @@ package uk.ac.leeds.ccg.andyt.projects.fluvialglacial;
 import java.awt.Color;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Random;
 import java.util.concurrent.ExecutorService;
-import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 import org.apache.commons.math3.analysis.polynomials.PolynomialFunction;
-import uk.ac.leeds.ccg.andyt.data.Generic_XYNumericalData;
-import uk.ac.leeds.ccg.andyt.chart.Generic_ScatterPlot;
+import uk.ac.leeds.ccg.andyt.data.Data_BiNumeric;
+import uk.ac.leeds.ccg.andyt.chart.examples.Chart_Scatter;
 import org.apache.commons.math3.fitting.PolynomialCurveFitter;
 import org.apache.commons.math3.fitting.WeightedObservedPoints;
-import uk.ac.leeds.ccg.andyt.math.Generic_BigDecimal;
+import uk.ac.leeds.ccg.andyt.math.Math_BigDecimal;
 //import org.apache.commons.math3.fitting.PolynomialCurveFitter
 
 /**
  *
  * @author geoagdt
  */
-public class SlopeAreaScatterPlot extends Generic_ScatterPlot {
+public class SlopeAreaScatterPlot extends Chart_Scatter {
 
     boolean isHump;
     public double maxy;
@@ -75,11 +72,11 @@ public class SlopeAreaScatterPlot extends Generic_ScatterPlot {
         PolynomialCurveFitter pcf;
         pcf = PolynomialCurveFitter.create(degree);
         final WeightedObservedPoints obs = new WeightedObservedPoints();
-        ArrayList<Generic_XYNumericalData> theGeneric_XYNumericalData;
-        theGeneric_XYNumericalData = (ArrayList<Generic_XYNumericalData>) data[0];
-        Iterator<Generic_XYNumericalData> ite;
-        ite = theGeneric_XYNumericalData.iterator();
-        Generic_XYNumericalData generic_XYNumericalData;
+        ArrayList<Data_BiNumeric> theData_BiNumeric;
+        theData_BiNumeric = (ArrayList<Data_BiNumeric>) data[0];
+        Iterator<Data_BiNumeric> ite;
+        ite = theData_BiNumeric.iterator();
+        Data_BiNumeric generic_XYNumericalData;
         while (ite.hasNext()) {
             generic_XYNumericalData = ite.next();
             obs.add(generic_XYNumericalData.x.doubleValue(),
@@ -95,7 +92,7 @@ public class SlopeAreaScatterPlot extends Generic_ScatterPlot {
         double c = 0.0d;
         for (int i = coeffs.length - 1; i > -1; i--) {
             System.out.println(coeffs[i]);
-            coeffBD = Generic_BigDecimal.roundToAndSetDecimalPlaces(
+            coeffBD = Math_BigDecimal.roundToAndSetDecimalPlaces(
                     BigDecimal.valueOf(coeffs[i]),
                     decimalPlacePrecisionForDisplay,
                     aRoundingMode);
@@ -131,8 +128,8 @@ public class SlopeAreaScatterPlot extends Generic_ScatterPlot {
 
         PolynomialFunction pf;
         pf = new PolynomialFunction(coeffs);
-        double minx = getMinX().doubleValue();
-        double maxx = getMaxX().doubleValue();
+        double minx = minX.doubleValue();
+        double maxx = maxX.doubleValue();
         double range = maxx - minx;
         int intervals = 100;
         double interval = range / (double) intervals;
@@ -141,7 +138,7 @@ public class SlopeAreaScatterPlot extends Generic_ScatterPlot {
 
         double x;
         double y;
-        bestfit = new ArrayList<Generic_XYNumericalData>();
+        bestfit = new ArrayList<Data_BiNumeric>();
         for (int i = 0; i < 100; i++) {
             x = minx + interval * i;
             y = pf.value(x);
@@ -149,7 +146,7 @@ public class SlopeAreaScatterPlot extends Generic_ScatterPlot {
                 maxy = y;
                 xAtMaxy = x;
             }
-            generic_XYNumericalData = new Generic_XYNumericalData(
+            generic_XYNumericalData = new Data_BiNumeric(
                     BigDecimal.valueOf(x),
                     BigDecimal.valueOf(y));
             bestfit.add(generic_XYNumericalData);
@@ -166,7 +163,7 @@ public class SlopeAreaScatterPlot extends Generic_ScatterPlot {
 
         double SRMSE = 0.0d;
         double deltay;
-        ite = theGeneric_XYNumericalData.iterator();
+        ite = theData_BiNumeric.iterator();
         while (ite.hasNext()) {
             generic_XYNumericalData = ite.next();
             x = generic_XYNumericalData.x.doubleValue();
@@ -174,15 +171,15 @@ public class SlopeAreaScatterPlot extends Generic_ScatterPlot {
             deltay = Math.sqrt(Math.pow(y - pf.value(x), 2));
             SRMSE += deltay;
         }
-        double MRMSE = SRMSE / (double) theGeneric_XYNumericalData.size();
-        title += ", MRMSE = " + (Generic_BigDecimal.roundToAndSetDecimalPlaces(
+        double MRMSE = SRMSE / (double) theData_BiNumeric.size();
+        title += ", MRMSE = " + (Math_BigDecimal.roundToAndSetDecimalPlaces(
                 BigDecimal.valueOf(MRMSE),
                 decimalPlacePrecisionForDisplay,
                 aRoundingMode)).toPlainString();
-        setTitle(title);
+        //setTitle(title);
     }
 
-    ArrayList<Generic_XYNumericalData> bestfit;
+    ArrayList<Data_BiNumeric> bestfit;
 
     /**
      * @param args the command line arguments
@@ -194,8 +191,8 @@ public class SlopeAreaScatterPlot extends Generic_ScatterPlot {
     @Override
     public void drawData() {
         super.drawData();
-        Iterator<Generic_XYNumericalData> ite = bestfit.iterator();
-        Generic_XYNumericalData generic_XYNumericalData;
+        Iterator<Data_BiNumeric> ite = bestfit.iterator();
+        Data_BiNumeric generic_XYNumericalData;
         Point2D aPoint2D = null;
         if (ite.hasNext()) {
             generic_XYNumericalData = ite.next();
@@ -221,11 +218,11 @@ public class SlopeAreaScatterPlot extends Generic_ScatterPlot {
         setPaint(Color.RED);
         aPoint2D = coordinateToScreen(
                 BigDecimal.valueOf(xAtMaxy2),
-                getMaxY());
+                maxY);
 //                   BigDecimal.valueOf(maxy));
         bPoint2D = coordinateToScreen(
                 BigDecimal.valueOf(xAtMaxy2),
-                getMinY());
+                minY);
         aLine2D = new Line2D.Double(aPoint2D, bPoint2D);
         draw(aLine2D);
     }
