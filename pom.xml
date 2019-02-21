@@ -6,18 +6,18 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>agdt-project-FluvioGlacial</name>
-    <url>https://github.com/agdturner/agdt-project-FluvioGlacial</url>
+    <name>agdt-java-project-FluvioGlacial</name>
+    <url>https://github.com/agdturner/agdt-java-project-FluvioGlacial</url>
     <description>A Java Library for processing fluvioglacial landscape data.</description>
     <scm>
-        <url>git@github.com:agdturner/agdt-project-FluvioGlacial.git</url>
-        <connection>scm:git:git@github.com:agdturner/agdt-project-FluvioGlacial.git</connection>
-        <developerConnection>scm:git:git@github.com:agdturner/agdt-project-FluvioGlacial</developerConnection>
+        <url>git@github.com:agdturner/agdt-java-project-FluvioGlacial.git</url>
+        <connection>scm:git:git@github.com:agdturner/agdt-java-project-FluvioGlacial.git</connection>
+        <developerConnection>scm:git:git@github.com:agdturner/agdt-java-project-FluvioGlacial</developerConnection>
     </scm>
     <licenses>
         <license>
             <name>Apache License 2.0</name>
-            <url>https://github.com/agdturner/agdt-project-FluvioGlacial/LICENSE.txt</url>
+            <url>https://github.com/agdturner/agdt-java-project-FluvioGlacial/LICENSE.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
