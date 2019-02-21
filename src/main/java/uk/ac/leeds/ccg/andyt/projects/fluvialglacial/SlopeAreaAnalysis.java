@@ -22,10 +22,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 //import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 import org.apache.commons.math.analysis.polynomials.PolynomialSplineFunction;
-import uk.ac.leeds.ccg.andyt.generic.data.Generic_XYNumericalData;
-import uk.ac.leeds.ccg.andyt.generic.io.Generic_StaticIO;
-import uk.ac.leeds.ccg.andyt.generic.math.Generic_BigDecimal;
-import uk.ac.leeds.ccg.andyt.generic.visualisation.charts.Generic_ScatterPlot;
+import uk.ac.leeds.ccg.andyt.data.Generic_XYNumericalData;
+import uk.ac.leeds.ccg.andyt.generic.io.Generic_IO;
+import uk.ac.leeds.ccg.andyt.math.Generic_BigDecimal;
+import uk.ac.leeds.ccg.andyt.chart.Generic_ScatterPlot;
 
 /**
  *
@@ -198,14 +198,14 @@ public class SlopeAreaAnalysis {
         TreeMap<Integer, Object[]> result;
         result = new TreeMap<Integer, Object[]>();
         BufferedReader br;
-        br = Generic_StaticIO.getBufferedReader(fileIn);
+        br = Generic_IO.getBufferedReader(fileIn);
         StreamTokenizer st;
         st = new StreamTokenizer(br);
-        Generic_StaticIO.setStreamTokenizerSyntax5(st);
+        Generic_IO.setStreamTokenizerSyntax5(st);
         st.wordChars('(', '(');
         st.wordChars(')', ')');
         st.wordChars('%', '%');
-        Generic_StaticIO.skipline(st);
+        Generic_IO.skipline(st);
         int token;
         String line = "";
         String[] fields;
@@ -293,14 +293,14 @@ public class SlopeAreaAnalysis {
         TreeMap<Integer, Object[]> result;
         result = new TreeMap<Integer, Object[]>();
         BufferedReader br;
-        br = Generic_StaticIO.getBufferedReader(fileIn);
+        br = Generic_IO.getBufferedReader(fileIn);
         StreamTokenizer st;
         st = new StreamTokenizer(br);
-        Generic_StaticIO.setStreamTokenizerSyntax5(st);
+        Generic_IO.setStreamTokenizerSyntax5(st);
         st.wordChars('(', '(');
         st.wordChars(')', ')');
         st.wordChars('%', '%');
-        Generic_StaticIO.skipline(st);
+        Generic_IO.skipline(st);
         int token;
         String line = "";
         String[] fields;

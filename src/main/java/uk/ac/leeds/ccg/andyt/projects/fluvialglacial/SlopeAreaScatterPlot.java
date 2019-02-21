@@ -18,11 +18,11 @@ import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
 import org.apache.commons.math3.analysis.polynomials.PolynomialFunction;
-import uk.ac.leeds.ccg.andyt.generic.data.Generic_XYNumericalData;
-import uk.ac.leeds.ccg.andyt.generic.visualisation.charts.Generic_ScatterPlot;
+import uk.ac.leeds.ccg.andyt.data.Generic_XYNumericalData;
+import uk.ac.leeds.ccg.andyt.chart.Generic_ScatterPlot;
 import org.apache.commons.math3.fitting.PolynomialCurveFitter;
 import org.apache.commons.math3.fitting.WeightedObservedPoints;
-import uk.ac.leeds.ccg.andyt.generic.math.Generic_BigDecimal;
+import uk.ac.leeds.ccg.andyt.math.Generic_BigDecimal;
 //import org.apache.commons.math3.fitting.PolynomialCurveFitter
 
 /**

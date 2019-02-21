@@ -21,7 +21,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import uk.ac.leeds.ccg.andyt.generic.io.Generic_StaticIO;
+import uk.ac.leeds.ccg.andyt.generic.io.Generic_IO;
 import uk.ac.leeds.ccg.andyt.grids.io.Grids_Files;
 
 /**
@@ -1193,7 +1193,7 @@ public class CrossSectionProcessing {
                     new FileInputStream(inputFile)));
             a_StreamTokenizer = new StreamTokenizer(a_BufferedReader);
             a_StreamTokenizer.resetSyntax();
-            Generic_StaticIO.setStreamTokenizerSyntax1(a_StreamTokenizer);
+            Generic_IO.setStreamTokenizerSyntax1(a_StreamTokenizer);
             a_StreamTokenizer.wordChars('(', '(');
             a_StreamTokenizer.wordChars(')', ')');
             a_StreamTokenizer.wordChars(':', ':');
