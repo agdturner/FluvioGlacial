@@ -33,14 +33,12 @@ import uk.ac.leeds.ccg.andyt.grids.core.grid.stats.Grids_GridDoubleStatsNotUpdat
 import uk.ac.leeds.ccg.andyt.grids.io.Grids_ESRIAsciiGridExporter;
 import uk.ac.leeds.ccg.andyt.grids.io.Grids_ESRIAsciiGridImporter;
 import uk.ac.leeds.ccg.andyt.grids.process.Grids_ProcessorDEM;
-import uk.ac.leeds.ccg.andyt.projects.fluvialglacial.core.FG_Strings;
 
 /**
  * A class developed for processing stream temperature data.
  */
 public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
 
-    protected final FG_Strings Strings;
     Grids_ESRIAsciiGridImporter ESRIAsciiGridImporter;
     boolean HandleOutOfMemoryError;
     String FileSeparator;
@@ -48,12 +46,10 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
     Grids_ESRIAsciiGridExporter ESRIAsciiGridExporter;
 
     protected TemperatureGridDataProcessing() {
-        Strings = new FG_Strings();
     }
 
     public TemperatureGridDataProcessing(Grids_Environment ge) {
         super(ge);
-        Strings = new FG_Strings();
     }
 
     /**
@@ -86,16 +82,11 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             //File directory = new File( "/scratch01/Work/Projects/"
             //            + "StreamTemperatureGridGeneralisation/workspace/");
             new TemperatureGridDataProcessing(ge).run();
-        } catch (Error e) {
+        } catch (Error | IOException | IllegalArgumentException e) {
             System.err.println(e.getLocalizedMessage());
-            //e.printStackTrace();
-        } catch (IOException e) {
-            System.err.println(e.getLocalizedMessage());
-            //e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            System.err.println(e.getLocalizedMessage());
-            //e.printStackTrace();
+            e.printStackTrace(System.err);
         }
+
     }
 
     public void run() throws IOException {
@@ -121,17 +112,12 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
                 + intervalRange + "_" + startIntervalBound + "/" + month + "/");
     }
 
-    public void runJuly(
-            double intervalRange,
-            double startIntervalBound)
-            throws IOException {
+    public void runJuly(double intervalRange, double startIntervalBound) {
         String month = "July";
         File inputDirectory = new File(Files.getInputDataDir().getAbsolutePath() + month);
-        File outputDirectory = getOutputFile(
-                intervalRange, startIntervalBound, month);
+        File outputDirectory = getOutputFile(intervalRange, startIntervalBound, month);
         outputDirectory.mkdirs();
-        PrintWriter output_PrintWriter = new PrintWriter(
-                new File(outputDirectory, month + ".csv"));
+        PrintWriter outputPW = env.env.io.getPrintWriter(new File(outputDirectory, month + ".csv"), false);
         int expectedNumberOfFiles = (5 * 24 + 1);
         System.out.println("expectedNumberOfFiles " + expectedNumberOfFiles);
         System.out.println("inputDirectory.listFiles().length "
@@ -173,7 +159,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
         //double[] dominance = getDominance(result);
         // Write results
         String line = getOutputHeader();
-        output_PrintWriter.println(line);
+        outputPW.println(line);
         System.out.println(line);
         resultIndex = 0;
         Object[] resultPart;
@@ -189,7 +175,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
                     line += "," + resultPart[i];
                 }
                 //line += "," + dominance[resultIndex];
-                output_PrintWriter.println(line);
+                outputPW.println(line);
                 System.out.println(line);
                 resultIndex++;
             }
@@ -200,21 +186,16 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             line += "," + resultPart[i];
         }
         //line += "," + dominance[resultIndex];
-        output_PrintWriter.println(line);
-        output_PrintWriter.close();
+        outputPW.println(line);
+        outputPW.close();
     }
 
-    public void runAugust(
-            double intervalRange,
-            double startIntervalBound)
-            throws IOException {
+    public void runAugust(double intervalRange, double startIntervalBound) {
         String month = "August";
         File inputDirectory = new File(Files.getInputDataDir().getAbsolutePath() + month);
-        File outputDirectory = getOutputFile(
-                intervalRange, startIntervalBound, month);
+        File outputDirectory = getOutputFile(intervalRange, startIntervalBound, month);
         outputDirectory.mkdirs();
-        PrintWriter output_PrintWriter = new PrintWriter(
-                new File(outputDirectory, month + ".csv"));
+        PrintWriter outputPW = env.env.io.getPrintWriter(new File(outputDirectory, month + ".csv"), false);
         int expectedNumberOfFiles = (6 * 24 + 1);
         System.out.println("expectedNumberOfFiles " + expectedNumberOfFiles);
         System.out.println("inputDirectory.listFiles().length "
@@ -256,7 +237,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
         //double[] dominance = getDominance(statisticsPerHour);
         // Write results
         String line = getOutputHeader();
-        output_PrintWriter.println(line);
+        outputPW.println(line);
         System.out.println(line);
         resultIndex = 0;
         for (int day = 24; day < 30; day++) {
@@ -271,7 +252,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
                     line += "," + resultPart[i];
                 }
                 //line += "," + dominance[resultIndex];
-                output_PrintWriter.println(line);
+                outputPW.println(line);
                 System.out.println(line);
                 resultIndex++;
             }
@@ -282,9 +263,9 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             line += "," + resultPart[i];
         }
         //line += "," + dominance[resultIndex];
-        output_PrintWriter.println(line);
+        outputPW.println(line);
         System.out.println(line);
-        output_PrintWriter.close();
+        outputPW.close();
     }
 
     public String getOutputHeader() {
@@ -330,8 +311,8 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
         Object[] result = new Object[numberOfOutputs];
         int outputIndex = 0;
         File dirGen;
-        dirGen = new File(ge.getDirectory(), "generated");
-        File dir = new File(ge.getFiles().getGeneratedGridDoubleDir(), inputFile.getName());
+        dirGen = new File(env.getDirectory(), "generated");
+        File dir = new File(env.getFiles().getGeneratedGridDoubleDir(), inputFile.getName());
         Grids_GridDouble g;
         g = (Grids_GridDouble) GridDoubleFactory.create(dir, inputFile);
         Grids_AbstractGridNumberStats gStatistics;

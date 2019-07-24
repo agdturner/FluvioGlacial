@@ -19,10 +19,8 @@ package uk.ac.leeds.ccg.andyt.projects.fluvialglacial;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import uk.ac.leeds.ccg.andyt.generic.io.Generic_IO;
-import uk.ac.leeds.ccg.andyt.grids.io.Grids_Files;
+import uk.ac.leeds.ccg.andyt.projects.fluvialglacial.core.FG_Environment;
+import uk.ac.leeds.ccg.andyt.projects.fluvialglacial.core.FG_Object;
 
 /**
  * A class for processing data representing a fluvial glacial outburst flood.
@@ -53,19 +51,21 @@ import uk.ac.leeds.ccg.andyt.grids.io.Grids_Files;
  * become part of it or part of an automated workflow that can reproduce the
  * results.
  */
-public class CrossSectionProcessing {
+public class CrossSectionProcessing extends FG_Object {
 
     /*
      * A reference to the place where the data is read from and written too 
      * file.
      */
-    File _Directory_File;
+    File dir;
 
-    protected CrossSectionProcessing() {
+    protected CrossSectionProcessing(FG_Environment e) {
+        super(e);
     }
 
-    public CrossSectionProcessing(File directory) {
-        _Directory_File = directory;
+    public CrossSectionProcessing(FG_Environment e, File dir) {
+        super(e);
+        this.dir = dir;
     }
 
     /**
@@ -77,30 +77,25 @@ public class CrossSectionProcessing {
      */
     public static void main(String[] args) {
         try {
-            File directory;
+            File dir;
             if (args.length > 1) {
                 throw new IllegalArgumentException("Expecting only one or no "
                         + "arguments. The argument is meant to be a directory "
                         + "location for input and output.");
             }
             if (args.length == 0) {
-                String userdir = System.getProperty("user.dir");
-                directory = new File(userdir);
+                dir = new File(System.getProperty("user.dir"));
             } else {
-                directory = new File(args[0]);
+                dir = new File(args[0]);
             }
-            if (!directory.exists()) {
-                throw new IOException("Directory " + directory + " does not "
-                        + "exist");
+            if (!dir.exists()) {
+                throw new IOException("Directory " + dir + " does not exist");
             }
             //File directory = new File("/scratch02/FluvialGlacial/workspace/");
-            new CrossSectionProcessing(directory).run();
-        } catch (Error e) {
+            new CrossSectionProcessing(new FG_Environment(), dir).run();
+        } catch (Error | Exception e) {
             System.err.println(e.getLocalizedMessage());
-            //e.printStackTrace();
-        } catch (Exception e) {
-            System.err.println(e.getLocalizedMessage());
-            //e.printStackTrace();
+            e.printStackTrace(System.err);
         }
     }
 
@@ -128,174 +123,73 @@ public class CrossSectionProcessing {
      * @param end A numerical name for the last cross section
      * @param increment A numerical increment for the cross sections
      */
-    public void process(
-            int start,
-            int end,
-            int increment) {
-        File inputDirectory = new File(
-                _Directory_File.getParentFile() + "/input/MODEL OUTPUT/");
-        File outputDirectory = new File(
-                _Directory_File.getParentFile() + "/output/MODEL OUTPUT/");
+    public void process(int start, int end, int increment) {
+        File indir = new File(dir.getParentFile() + "/input/MODEL OUTPUT/");
+        File outdir = new File(dir.getParentFile() + "/output/MODEL OUTPUT/");
 
         // Depth preparation
-        File depthInputDirectory = new File(
-                inputDirectory,
-                "depth alltimes");
-        File depthOutputDirectory = new File(
-                outputDirectory,
-                "depth alltimes");
-        File depthRowOutputDirectory = new File(
-                depthOutputDirectory,
-                "rowGeneralisation");
-        depthRowOutputDirectory.mkdirs();
-        File depthColOutputDirectory = new File(
-                depthOutputDirectory,
-                "colGeneralisation");
-        depthColOutputDirectory.mkdirs();
-        File depthRowAndColOutputDirectory = new File(
-                depthOutputDirectory,
-                "rowAndColGeneralisation");
-        depthRowAndColOutputDirectory.mkdirs();
-        File depthRowAndColOutputFile = new File(
-                depthRowAndColOutputDirectory,
-                "depth.csv");
-        PrintWriter depthRowAndCol_PrintWriter = null;
-        try {
-            depthRowAndCol_PrintWriter = new PrintWriter(
-                    depthRowAndColOutputFile);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(CrossSectionProcessing.class.getName()).log(
-                    Level.SEVERE, null, ex);
-        }
+        File depthIndir = new File(indir, "depth alltimes");
+        File depthOutdir = new File(outdir, "depth alltimes");
+        File depthRowOutdir = new File(depthOutdir, "rowGeneralisation");
+        depthRowOutdir.mkdirs();
+        File depthColOutdir = new File(depthOutdir, "colGeneralisation");
+        depthColOutdir.mkdirs();
+        File depthRowAndColOutdir = new File(depthOutdir, "rowAndColGeneralisation");
+        depthRowAndColOutdir.mkdirs();
+        File depthRowAndColOutfile = new File(depthRowAndColOutdir, "depth.csv");
+        PrintWriter depthRowAndColPW = env.io.getPrintWriter(depthRowAndColOutfile, false);
         // Depth thesholds 4, 6, 8, 10
-        depthRowAndCol_PrintWriter.println(
-                "Cross Section Number, Total N, "
-                + "Total Sum, Mean,"
-                + "Max, MaxCount, "
-                + "Inundation Time Max Column, Max Time, "
-                + "Time to Max, "
-                + "Number of values > 4, Number of values > 6, "
-                + "Number of values > 8, Number of values > 10");
+        String header0 = "Cross Section Number,Total N,Total Sum,Mean,Max,"
+                + "MaxCount,Inundation Time Max Column,Max Time,Time to Max,";
+        String header1 = "Number of values > 4,Number of values > 6,"
+                + "Number of values > 8,Number of values > 10";
+        depthRowAndColPW.println(header0 + header1);
 
         // Velocity preparation
-        File velocityInputDirectory = new File(
-                inputDirectory,
-                "velocity alltimes");
-        File velocityOutputDirectory = new File(
-                outputDirectory,
-                "velocity alltimes");
-        File velocityRowOutputDirectory = new File(
-                velocityOutputDirectory,
-                "rowGeneralisation");
-        velocityRowOutputDirectory.mkdirs();
-        File velocityColOutputDirectory = new File(
-                velocityOutputDirectory,
-                "colGeneralisation");
-        velocityColOutputDirectory.mkdirs();
-        File velocityRowAndColOutputDirectory = new File(
-                velocityOutputDirectory,
-                "rowAndColGeneralisation");
-        velocityRowAndColOutputDirectory.mkdirs();
-        File velocityRowAndColOutputFile = new File(
-                velocityRowAndColOutputDirectory,
-                "velocity.csv");
-        PrintWriter velocityRowAndCol_PrintWriter = null;
-        try {
-            velocityRowAndCol_PrintWriter = new PrintWriter(
-                    velocityRowAndColOutputFile);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(CrossSectionProcessing.class.getName()).log(
-                    Level.SEVERE, null, ex);
-        }
+        File velocityIndir = new File(indir, "velocity alltimes");
+        File velocityOutdir = new File(outdir, "velocity alltimes");
+        File velocityRowOutdir = new File(velocityOutdir, "rowGeneralisation");
+        velocityRowOutdir.mkdirs();
+        File velocityColOutdir = new File(velocityOutdir, "colGeneralisation");
+        velocityColOutdir.mkdirs();
+        File velocityRowAndColOutdir = new File(velocityOutdir, "rowAndColGeneralisation");
+        velocityRowAndColOutdir.mkdirs();
+        File velocityRowAndColOutfile = new File(velocityRowAndColOutdir, "velocity.csv");
+        PrintWriter velocityRowAndColPW = env.io.getPrintWriter(velocityRowAndColOutfile, false);
         // velocity thesholds 4, 6, 8, 10
-        velocityRowAndCol_PrintWriter.println(
-                "Cross Section Number, Total N, "
-                + "Total Sum, Mean,"
-                + "Max, MaxCount, "
-                + "Inundation Time Max Column, Max Time, "
-                + "Time to Max, "
-                + "Number of values > 4, Number of values > 6, "
-                + "Number of values > 8, Number of values > 10");
+        velocityRowAndColPW.println(header0 + header1);
 
         // Shear stress preparation 
-        File shearStressInputDirectory = new File(
-                inputDirectory,
-                "shear stress alltimes");
-        File shearStressOutputDirectory = new File(
-                outputDirectory,
-                "shear stress alltimes");
-        File shearStressRowOutputDirectory = new File(
-                shearStressOutputDirectory,
-                "rowGeneralisation");
-        shearStressRowOutputDirectory.mkdirs();
-        File shearStressColOutputDirectory = new File(
-                shearStressOutputDirectory,
-                "colGeneralisation");
-        shearStressColOutputDirectory.mkdirs();
-        File shearStressRowAndColOutputDirectory = new File(
-                shearStressOutputDirectory,
-                "rowAndColGeneralisation");
-        shearStressRowAndColOutputDirectory.mkdirs();
-        File shearStressRowAndColOutputFile = new File(
-                shearStressRowAndColOutputDirectory,
-                "shear stress.csv");
-        PrintWriter shearStressRowAndCol_PrintWriter = null;
-        try {
-            shearStressRowAndCol_PrintWriter = new PrintWriter(
-                    shearStressRowAndColOutputFile);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(CrossSectionProcessing.class.getName()).log(
-                    Level.SEVERE, null, ex);
-        }
+        File shearStressIndir = new File(indir, "shear stress alltimes");
+        File shearStressOutdir = new File(outdir, "shear stress alltimes");
+        File shearStressRowOutdir = new File(shearStressOutdir, "rowGeneralisation");
+        shearStressRowOutdir.mkdirs();
+        File shearStressColOutdir = new File(shearStressOutdir, "colGeneralisation");
+        shearStressColOutdir.mkdirs();
+        File shearStressRowAndColOutdir = new File(shearStressOutdir, "rowAndColGeneralisation");
+        shearStressRowAndColOutdir.mkdirs();
+        File shearStressRowAndColOutfile = new File(shearStressRowAndColOutdir, "shear stress.csv");
+        PrintWriter shearStressRowAndColPW = env.io.getPrintWriter(shearStressRowAndColOutfile, false);
         // shearStress thesholds 200, 1000, 2500, 5000
-        shearStressRowAndCol_PrintWriter.println(
-                "Cross Section Number, Total N, "
-                + "Total Sum, Mean,"
-                + "Max, MaxCount, "
-                + "Inundation Time Max Column, Max Time, "
-                + "Time to Max, "
-                + "Number of values > 200, Number of values > 1000, "
-                + "Number of values > 2500, Number of values > 5000");
+        shearStressRowAndColPW.println(header0 + "Number of values > 200,"
+                + "Number of values > 1000,Number of values > 2500,"
+                + "Number of values > 5000");
 
         // Froude preparation
-        File froudeInputDirectory = new File(
-                inputDirectory,
-                "froude alltimes");
-        File froudeOutputDirectory = new File(
-                outputDirectory,
-                "froude alltimes");
-        File froudeRowOutputDirectory = new File(
-                froudeOutputDirectory,
-                "rowGeneralisation");
-        froudeRowOutputDirectory.mkdirs();
-        File froudeColOutputDirectory = new File(
-                froudeOutputDirectory,
-                "colGeneralisation");
-        froudeColOutputDirectory.mkdirs();
-        File froudeRowAndColOutputDirectory = new File(
-                froudeOutputDirectory,
-                "rowAndColGeneralisation");
-        froudeRowAndColOutputDirectory.mkdirs();
-        File froudeRowAndColOutputFile = new File(
-                froudeRowAndColOutputDirectory,
-                "froude.csv");
-        PrintWriter froudeRowAndCol_PrintWriter = null;
-        try {
-            froudeRowAndCol_PrintWriter = new PrintWriter(
-                    froudeRowAndColOutputFile);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(CrossSectionProcessing.class.getName()).log(
-                    Level.SEVERE, null, ex);
-        }
+        File froudeIndir = new File(indir, "froude alltimes");
+        File froudeOutdir = new File(outdir, "froude alltimes");
+        File froudeRowOutdir = new File(froudeOutdir, "rowGeneralisation");
+        froudeRowOutdir.mkdirs();
+        File froudeColOutdir = new File(froudeOutdir, "colGeneralisation");
+        froudeColOutdir.mkdirs();
+        File froudeRowAndColOutdir = new File(froudeOutdir, "rowAndColGeneralisation");
+        froudeRowAndColOutdir.mkdirs();
+        File froudeRowAndColOutfile = new File(froudeRowAndColOutdir, "froude.csv");
+        PrintWriter froudeRowAndColPW = env.io.getPrintWriter(froudeRowAndColOutfile, false);
         // froude thesholds 0.8, 0.9, 1.0, 1.1
-        froudeRowAndCol_PrintWriter.println(
-                "Cross Section Number, Total N, "
-                + "Total Sum, Mean,"
-                + "Max, MaxCount, "
-                + "Inundation Time Max Column, Max Time, "
-                + "Time to Max, "
-                + "Number of values > 0.8, Number of values > 0.9, "
-                + "Number of values > 1.0, Number of values > 1.1");
+        froudeRowAndColPW.println(header0 + "Number of values > 0.8,"
+                + "Number of values > 0.9,Number of values > 1.0,"
+                + "Number of values > 1.1");
 
         int depthFileCount = 0;
         int velocityFileCount = 0;
@@ -315,9 +209,7 @@ public class CrossSectionProcessing {
             int depthT2Count = 0;
             int depthT3Count = 0;
             int depthT4Count = 0;
-            File depthInputFile = new File(
-                    depthInputDirectory,
-                    "depth " + i + ".csv");
+            File depthInputFile = new File(depthIndir, "depth " + i + ".csv");
             // Test file exists
             if (!depthInputFile.exists()) {
                 System.out.println(depthInputFile + "does not exist");
@@ -337,9 +229,7 @@ public class CrossSectionProcessing {
             int velocityT2Count = 0;
             int velocityT3Count = 0;
             int velocityT4Count = 0;
-            File velocityInputFile = new File(
-                    velocityInputDirectory,
-                    "velocity " + i + ".csv");
+            File velocityInputFile = new File(velocityIndir, "velocity " + i + ".csv");
             // Test file exists
             if (!velocityInputFile.exists()) {
                 System.out.println(velocityInputFile + "does not exist");
@@ -359,9 +249,7 @@ public class CrossSectionProcessing {
             int shearStressT2Count = 0;
             int shearStressT3Count = 0;
             int shearStressT4Count = 0;
-            File shearStressInputFile = new File(
-                    shearStressInputDirectory,
-                    "shear stress " + i + ".csv");
+            File shearStressInputFile = new File(shearStressIndir, "shear stress " + i + ".csv");
             // Test file exists
             if (!shearStressInputFile.exists()) {
                 System.out.println(shearStressInputFile + "does not exist");
@@ -381,9 +269,7 @@ public class CrossSectionProcessing {
             int froudeT2Count = 0;
             int froudeT3Count = 0;
             int froudeT4Count = 0;
-            File froudeInputFile = new File(
-                    froudeInputDirectory,
-                    "froude " + i + ".csv");
+            File froudeInputFile = new File(froudeIndir, "froude " + i + ".csv");
             // Test file exists
             if (!froudeInputFile.exists()) {
                 System.out.println(froudeInputFile + "does not exist");
@@ -399,14 +285,10 @@ public class CrossSectionProcessing {
             String froudeMaxTime = null;
 
             // Read data
-            ArrayList[] depthData = readIntoArrayList(
-                    depthInputFile);
-            ArrayList[] velocityData = readIntoArrayList(
-                    velocityInputFile);
-            ArrayList[] shearStressData = readIntoArrayList(
-                    shearStressInputFile);
-            ArrayList[] froudeData = readIntoArrayList(
-                    froudeInputFile);
+            ArrayList[] depthData = readIntoArrayList(depthInputFile);
+            ArrayList[] velocityData = readIntoArrayList(velocityInputFile);
+            ArrayList[] shearStressData = readIntoArrayList(shearStressInputFile);
+            ArrayList[] froudeData = readIntoArrayList(froudeInputFile);
 
             ArrayList depthTimes = depthData[0];
             ArrayList depthDataValues = depthData[1];
@@ -418,7 +300,6 @@ public class CrossSectionProcessing {
             ArrayList froudeDataValues = froudeData[1];
 
             // RowProcessing
-
             // Lose 4 rows as per instructions from Jonathan Carrivick
             int depthNumberOfRows = depthDataValues.size() - 4;
             int velocityNumberOfRows = velocityDataValues.size() - 4;
@@ -426,17 +307,9 @@ public class CrossSectionProcessing {
             int froudeNumberOfRows = froudeDataValues.size() - 4;
 
             // depth
-            File depthRowOutputFile = new File(
-                    depthRowOutputDirectory,
-                    "depth " + i + ".csv");
-            PrintWriter depthRow_PrintWriter = null;
-            try {
-                depthRow_PrintWriter = new PrintWriter(depthRowOutputFile);
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(CrossSectionProcessing.class.getName()).log(
-                        Level.SEVERE, null, ex);
-            }
-            depthRow_PrintWriter.println("n,sum,mean,max");
+            File depthRowOutfile = new File(depthRowOutdir, "depth " + i + ".csv");
+            PrintWriter depthRowPW = env.io.getPrintWriter(depthRowOutfile, false);
+            depthRowPW.println("n,sum,mean,max");
             for (int rowIndex = 0; rowIndex < depthNumberOfRows; rowIndex++) {
                 double[] row = (double[]) depthDataValues.get(rowIndex);
                 double max = Double.MIN_NORMAL;
@@ -448,7 +321,7 @@ public class CrossSectionProcessing {
                 boolean depthT3 = false;
                 boolean depthT4 = false;
                 for (int column = 0; column < row.length; column++) {
-                    value = Double.valueOf(row[column]);
+                    value = row[column];
                     if (value != 0 && value != -999) {
                         n++;
                         sum += value;
@@ -493,24 +366,15 @@ public class CrossSectionProcessing {
                     System.out.println("sum " + sum);
                     System.out.println("mean " + mean);
                     System.out.println("max " + max);
-                    depthRow_PrintWriter.println(
-                            n + "," + sum + "," + mean + "," + max);
+                    depthRowPW.println(n + "," + sum + "," + mean + "," + max);
                 }
             }
-            depthRow_PrintWriter.close();
+            depthRowPW.close();
 
             // velocity
-            File velocityRowOutputFile = new File(
-                    velocityRowOutputDirectory,
-                    "velocity " + i + ".csv");
-            PrintWriter velocityRow_PrintWriter = null;
-            try {
-                velocityRow_PrintWriter = new PrintWriter(velocityRowOutputFile);
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(CrossSectionProcessing.class.getName()).log(
-                        Level.SEVERE, null, ex);
-            }
-            velocityRow_PrintWriter.println("n,sum,mean,max");
+            File velocityRowOutfile = new File(velocityRowOutdir, "velocity " + i + ".csv");
+            PrintWriter velocityRowPW = env.io.getPrintWriter(velocityRowOutfile, false);
+            velocityRowPW.println("n,sum,mean,max");
             for (int rowIndex = 0; rowIndex < velocityNumberOfRows; rowIndex++) {
                 double[] row = (double[]) velocityDataValues.get(rowIndex);
                 double max = Double.MIN_NORMAL;
@@ -522,7 +386,7 @@ public class CrossSectionProcessing {
                 boolean velocityT3 = false;
                 boolean velocityT4 = false;
                 for (int column = 0; column < row.length; column++) {
-                    value = Double.valueOf(row[column]);
+                    value = row[column];
                     if (value != 0 && value != -999) {
                         n++;
                         sum += value;
@@ -567,25 +431,16 @@ public class CrossSectionProcessing {
                     System.out.println("sum " + sum);
                     System.out.println("mean " + mean);
                     System.out.println("max " + max);
-                    velocityRow_PrintWriter.println(
+                    velocityRowPW.println(
                             n + "," + sum + "," + mean + "," + max);
                 }
             }
-            velocityRow_PrintWriter.close();
+            velocityRowPW.close();
 
             // shear stress
-            File shearStressRowOutputFile = new File(
-                    shearStressRowOutputDirectory,
-                    "shear stress " + i + ".csv");
-            PrintWriter shearStressRow_PrintWriter = null;
-            try {
-                shearStressRow_PrintWriter = new PrintWriter(
-                        shearStressRowOutputFile);
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(CrossSectionProcessing.class.getName()).log(
-                        Level.SEVERE, null, ex);
-            }
-            shearStressRow_PrintWriter.println("n,sum,mean,max");
+            File shearStressRowOutfile = new File(shearStressRowOutdir, "shear stress " + i + ".csv");
+            PrintWriter shearStressRowPW = env.io.getPrintWriter(shearStressRowOutfile, false);
+            shearStressRowPW.println("n,sum,mean,max");
             for (int rowIndex = 0; rowIndex < shearStressNumberOfRows; rowIndex++) {
                 double[] row = (double[]) shearStressDataValues.get(rowIndex);
                 double max = Double.MIN_NORMAL;
@@ -597,7 +452,7 @@ public class CrossSectionProcessing {
                 boolean shearStressT3 = false;
                 boolean shearStressT4 = false;
                 for (int column = 0; column < row.length; column++) {
-                    value = Double.valueOf(row[column]);
+                    value = row[column];
                     if (value != 0 && value != -999) {
                         n++;
                         sum += value;
@@ -642,24 +497,16 @@ public class CrossSectionProcessing {
                     System.out.println("sum " + sum);
                     System.out.println("mean " + mean);
                     System.out.println("max " + max);
-                    shearStressRow_PrintWriter.println(
+                    shearStressRowPW.println(
                             n + "," + sum + "," + mean + "," + max);
                 }
             }
-            shearStressRow_PrintWriter.close();
+            shearStressRowPW.close();
 
             // froude
-            File froudeRowOutputFile = new File(
-                    froudeRowOutputDirectory,
-                    "froude " + i + ".csv");
-            PrintWriter froudeRow_PrintWriter = null;
-            try {
-                froudeRow_PrintWriter = new PrintWriter(froudeRowOutputFile);
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(CrossSectionProcessing.class.getName()).log(
-                        Level.SEVERE, null, ex);
-            }
-            froudeRow_PrintWriter.println("n,sum,mean,max");
+            File froudeRowOutfile = new File(froudeRowOutdir, "froude " + i + ".csv");
+            PrintWriter froudeRowPW = env.io.getPrintWriter(froudeRowOutfile, false);
+            froudeRowPW.println("n,sum,mean,max");
             for (int rowIndex = 0; rowIndex < froudeNumberOfRows; rowIndex++) {
                 double[] row = (double[]) froudeDataValues.get(rowIndex);
                 double max = Double.MIN_NORMAL;
@@ -671,7 +518,7 @@ public class CrossSectionProcessing {
                 boolean froudeT3 = false;
                 boolean froudeT4 = false;
                 for (int column = 0; column < row.length; column++) {
-                    value = Double.valueOf(row[column]);
+                    value = row[column];
                     if (value != 0 && value != -999) {
                         n++;
                         sum += value;
@@ -716,27 +563,18 @@ public class CrossSectionProcessing {
                     System.out.println("sum " + sum);
                     System.out.println("mean " + mean);
                     System.out.println("max " + max);
-                    froudeRow_PrintWriter.println(
+                    froudeRowPW.println(
                             n + "," + sum + "," + mean + "," + max);
                 }
             }
-            froudeRow_PrintWriter.close();
+            froudeRowPW.close();
 
             // Column Processing
             // depth
-            File depthColOutputFile = new File(
-                    depthColOutputDirectory,
-                    "depth " + i + ".csv");
-            PrintWriter depthCol_PrintWriter = null;
-            try {
-                depthCol_PrintWriter = new PrintWriter(depthColOutputFile);
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(CrossSectionProcessing.class.getName()).log(
-                        Level.SEVERE, null, ex);
-            }
-            depthCol_PrintWriter.println(
-                    "Cross Section Column, Inundation Time, Time at Max, "
-                    + "Time To Max, Max");
+            File depthColOutfile = new File(depthColOutdir, "depth " + i + ".csv");
+            PrintWriter depthColPW = env.io.getPrintWriter(depthColOutfile, false);
+            String header3 = "Cross Section Column,Inundation Time,Time at Max,Time To Max,Max";
+            depthColPW.println(header3);
             int numberOfCols = ((double[]) depthDataValues.get(0)).length;
             double[] columnMax = new double[numberOfCols];
             String[] inundationTime = new String[numberOfCols];
@@ -746,7 +584,7 @@ public class CrossSectionProcessing {
                 double[] row = (double[]) depthDataValues.get(rowIndex);
                 double value;
                 for (int column = 0; column < numberOfCols; column++) {
-                    value = Double.valueOf(row[column]);
+                    value = row[column];
                     if (value != 0 && value != -999) {
                         if (value == totalDepthMax) {
                             if (depthMaxCount == 0) {
@@ -754,8 +592,8 @@ public class CrossSectionProcessing {
                                 if (inundationTime[column] == null) {
                                     depthInundationTimeMaxColumn = depthMaxTime;
                                 } else {
-                                    depthInundationTimeMaxColumn =
-                                            inundationTime[column];
+                                    depthInundationTimeMaxColumn
+                                            = inundationTime[column];
                                 }
                             }
                             depthMaxCount++;
@@ -787,26 +625,16 @@ public class CrossSectionProcessing {
                 if (maxTime[column] != null) {
                     mTime = (maxTime[column].split(" "))[1];
                 }
-                depthCol_PrintWriter.println(column + ", " + inTime
-                        + ", " + mTime + ", " + timeToMax + ", "
+                depthColPW.println(column + "," + inTime
+                        + "," + mTime + "," + timeToMax + ","
                         + columnMax[column]);
             }
-            depthCol_PrintWriter.close();
+            depthColPW.close();
 
             // velocity
-            File velocityColOutputFile = new File(
-                    velocityColOutputDirectory,
-                    "velocity " + i + ".csv");
-            PrintWriter velocityCol_PrintWriter = null;
-            try {
-                velocityCol_PrintWriter = new PrintWriter(velocityColOutputFile);
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(CrossSectionProcessing.class.getName()).log(
-                        Level.SEVERE, null, ex);
-            }
-            velocityCol_PrintWriter.println(
-                    "Cross Section Column, Inundation Time, Time at Max, "
-                    + "Time To Max, Max");
+            File velocityColOutfile = new File(velocityColOutdir, "velocity " + i + ".csv");
+            PrintWriter velocityColPW = env.io.getPrintWriter(velocityColOutfile, false);
+            velocityColPW.println(header3);
             numberOfCols = ((double[]) velocityDataValues.get(0)).length;
             columnMax = new double[numberOfCols];
             inundationTime = new String[numberOfCols];
@@ -816,18 +644,16 @@ public class CrossSectionProcessing {
                 double[] row = (double[]) velocityDataValues.get(rowIndex);
                 double value;
                 for (int column = 0; column < numberOfCols; column++) {
-                    value = Double.valueOf(row[column]);
+                    value = row[column];
                     if (value != 0 && value != -999) {
                         if (value == totalVelocityMax) {
                             if (velocityMaxCount == 0) {
                                 velocityMaxTime = (String) velocityTimes.get(
                                         rowIndex);
                                 if (inundationTime[column] == null) {
-                                    velocityInundationTimeMaxColumn =
-                                            velocityMaxTime;
+                                    velocityInundationTimeMaxColumn = velocityMaxTime;
                                 } else {
-                                    velocityInundationTimeMaxColumn =
-                                            inundationTime[column];
+                                    velocityInundationTimeMaxColumn = inundationTime[column];
                                 }
                             }
                             velocityMaxCount++;
@@ -860,27 +686,16 @@ public class CrossSectionProcessing {
                 if (maxTime[column] != null) {
                     mTime = (maxTime[column].split(" "))[1];
                 }
-                velocityRow_PrintWriter.println(column + ", " + inTime
-                        + ", " + mTime + ", " + timeToMax + ", "
+                velocityRowPW.println(column + "," + inTime
+                        + "," + mTime + "," + timeToMax + ","
                         + columnMax[column]);
             }
-            velocityRow_PrintWriter.close();
+            velocityRowPW.close();
 
             // shearStress
-            File shearStressColOutputFile = new File(
-                    shearStressColOutputDirectory,
-                    "shear stress " + i + ".csv");
-            PrintWriter shearStressCol_PrintWriter = null;
-            try {
-                shearStressCol_PrintWriter = new PrintWriter(
-                        shearStressColOutputFile);
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(CrossSectionProcessing.class.getName()).log(
-                        Level.SEVERE, null, ex);
-            }
-            shearStressCol_PrintWriter.println(
-                    "Cross Section Column, Inundation Time, Time at Max, "
-                    + "Time To Max, Max");
+            File shearStressColOutfile = new File(shearStressColOutdir, "shear stress " + i + ".csv");
+            PrintWriter shearStressColPW = env.io.getPrintWriter(shearStressColOutfile, false);
+            shearStressColPW.println(header3);
             numberOfCols = ((double[]) shearStressDataValues.get(0)).length;
             columnMax = new double[numberOfCols];
             inundationTime = new String[numberOfCols];
@@ -890,26 +705,26 @@ public class CrossSectionProcessing {
                 double[] row = (double[]) shearStressDataValues.get(rowIndex);
                 double value;
                 for (int column = 0; column < numberOfCols; column++) {
-                    value = Double.valueOf(row[column]);
+                    value = row[column];
                     if (value != 0 && value != -999) {
                         if (value == totalShearStressMax) {
                             if (shearStressMaxCount == 0) {
-                                shearStressMaxTime =
-                                        (String) shearStressTimes.get(rowIndex);
+                                shearStressMaxTime
+                                        = (String) shearStressTimes.get(rowIndex);
                                 if (inundationTime[column] == null) {
-                                    shearStressInundationTimeMaxColumn =
-                                            shearStressMaxTime;
+                                    shearStressInundationTimeMaxColumn
+                                            = shearStressMaxTime;
                                 } else {
-                                    shearStressInundationTimeMaxColumn =
-                                            inundationTime[column];
+                                    shearStressInundationTimeMaxColumn
+                                            = inundationTime[column];
                                 }
                             }
                             shearStressMaxCount++;
                         }
                         if (!inundated[column]) {
                             inundated[column] = true;
-                            inundationTime[column] =
-                                    (String) shearStressTimes.get(rowIndex);
+                            inundationTime[column]
+                                    = (String) shearStressTimes.get(rowIndex);
                             maxTime[column] = (String) shearStressTimes.get(
                                     rowIndex);
                             columnMax[column] = value;
@@ -935,26 +750,16 @@ public class CrossSectionProcessing {
                 if (maxTime[column] != null) {
                     mTime = (maxTime[column].split(" "))[1];
                 }
-                shearStressCol_PrintWriter.println(column + ", " + inTime
-                        + ", " + mTime + ", " + timeToMax + ", "
+                shearStressColPW.println(column + "," + inTime
+                        + "," + mTime + "," + timeToMax + ","
                         + columnMax[column]);
             }
-            shearStressCol_PrintWriter.close();
+            shearStressColPW.close();
 
             // froude
-            File froudeColOutputFile = new File(
-                    froudeColOutputDirectory,
-                    "froude " + i + ".csv");
-            PrintWriter froudeCol_PrintWriter = null;
-            try {
-                froudeCol_PrintWriter = new PrintWriter(froudeColOutputFile);
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(CrossSectionProcessing.class.getName()).log(
-                        Level.SEVERE, null, ex);
-            }
-            froudeCol_PrintWriter.println(
-                    "Cross Section Column, Inundation Time, Time at Max, "
-                    + "Time To Max, Max");
+            File froudeColOutfile = new File(froudeColOutdir, "froude " + i + ".csv");
+            PrintWriter froudeColPW = env.io.getPrintWriter(froudeColOutfile, false);
+            froudeColPW.println(header3);
             numberOfCols = ((double[]) froudeDataValues.get(0)).length;
             columnMax = new double[numberOfCols];
             inundationTime = new String[numberOfCols];
@@ -964,18 +769,18 @@ public class CrossSectionProcessing {
                 double[] row = (double[]) froudeDataValues.get(rowIndex);
                 double value;
                 for (int column = 0; column < numberOfCols; column++) {
-                    value = Double.valueOf(row[column]);
+                    value = row[column];
                     if (value != 0 && value != -999) {
                         if (value == totalFroudeMax) {
                             if (froudeMaxCount == 0) {
                                 froudeMaxTime = (String) froudeTimes.get(
                                         rowIndex);
                                 if (inundationTime[column] == null) {
-                                    froudeInundationTimeMaxColumn =
-                                            froudeMaxTime;
+                                    froudeInundationTimeMaxColumn
+                                            = froudeMaxTime;
                                 } else {
-                                    froudeInundationTimeMaxColumn =
-                                            inundationTime[column];
+                                    froudeInundationTimeMaxColumn
+                                            = inundationTime[column];
                                 }
                             }
                             froudeMaxCount++;
@@ -1007,11 +812,11 @@ public class CrossSectionProcessing {
                 if (maxTime[column] != null) {
                     mTime = (maxTime[column].split(" "))[1];
                 }
-                froudeCol_PrintWriter.println(column + ", " + inTime
-                        + ", " + mTime + ", " + timeToMax + ", "
+                froudeColPW.println(column + "," + inTime
+                        + "," + mTime + "," + timeToMax + ","
                         + columnMax[column]);
             }
-            froudeCol_PrintWriter.close();
+            froudeColPW.close();
 
             // Row and Column output
             // depth
@@ -1026,14 +831,14 @@ public class CrossSectionProcessing {
             if (depthMaxTime != null) {
                 mTime = depthMaxTime.split(" ")[1];
             }
-            depthRowAndCol_PrintWriter.println(
-                    i + ", " + (int) totalDepthN + ", "
-                    + totalDepthSum + ", " + totalDepthMean + ", "
-                    + totalDepthMax + ", " + depthMaxCount + ", "
-                    + inTime + ", " + mTime + ", "
-                    + timeToMaxDepth + ", "
-                    + depthT1Count + ", " + depthT2Count + ", "
-                    + depthT3Count + ", " + depthT4Count);
+            depthRowAndColPW.println(
+                    i + "," + (int) totalDepthN + ","
+                    + totalDepthSum + "," + totalDepthMean + ","
+                    + totalDepthMax + "," + depthMaxCount + ","
+                    + inTime + "," + mTime + ","
+                    + timeToMaxDepth + ","
+                    + depthT1Count + "," + depthT2Count + ","
+                    + depthT3Count + "," + depthT4Count);
             // velocity
             totalVelocityMean = totalVelocitySum / totalVelocityN;
             int timeToMaxVelocity = getTimeToMax(
@@ -1046,14 +851,14 @@ public class CrossSectionProcessing {
             if (velocityMaxTime != null) {
                 mTime = velocityMaxTime.split(" ")[1];
             }
-            velocityRowAndCol_PrintWriter.println(
-                    i + ", " + (int) totalVelocityN + ", "
-                    + totalVelocitySum + ", " + totalVelocityMean + ", "
-                    + totalVelocityMax + ", " + velocityMaxCount + ", "
-                    + inTime + ", " + mTime + ", "
-                    + timeToMaxVelocity + ", "
-                    + velocityT1Count + ", " + velocityT2Count + ", "
-                    + velocityT3Count + ", " + velocityT4Count);
+            velocityRowAndColPW.println(
+                    i + "," + (int) totalVelocityN + ","
+                    + totalVelocitySum + "," + totalVelocityMean + ","
+                    + totalVelocityMax + "," + velocityMaxCount + ","
+                    + inTime + "," + mTime + ","
+                    + timeToMaxVelocity + ","
+                    + velocityT1Count + "," + velocityT2Count + ","
+                    + velocityT3Count + "," + velocityT4Count);
             // shearStress
             totalShearStressMean = totalShearStressSum / totalShearStressN;
             int timeToMaxShearStress = getTimeToMax(
@@ -1066,14 +871,14 @@ public class CrossSectionProcessing {
             if (shearStressMaxTime != null) {
                 mTime = shearStressMaxTime.split(" ")[1];
             }
-            shearStressRowAndCol_PrintWriter.println(
-                    i + ", " + (int) totalShearStressN + ", "
-                    + totalShearStressSum + ", " + totalShearStressMean + ", "
-                    + totalShearStressMax + ", " + shearStressMaxCount + ", "
-                    + inTime + ", " + mTime + ", "
-                    + timeToMaxShearStress + ", "
-                    + shearStressT1Count + ", " + shearStressT2Count + ", "
-                    + shearStressT3Count + ", " + shearStressT4Count);
+            shearStressRowAndColPW.println(
+                    i + "," + (int) totalShearStressN + ","
+                    + totalShearStressSum + "," + totalShearStressMean + ","
+                    + totalShearStressMax + "," + shearStressMaxCount + ","
+                    + inTime + "," + mTime + ","
+                    + timeToMaxShearStress + ","
+                    + shearStressT1Count + "," + shearStressT2Count + ","
+                    + shearStressT3Count + "," + shearStressT4Count);
             // froude
             totalFroudeMean = totalFroudeSum / totalFroudeN;
             int timeToMaxFroude = getTimeToMax(
@@ -1086,58 +891,46 @@ public class CrossSectionProcessing {
             if (froudeMaxTime != null) {
                 mTime = froudeMaxTime.split(" ")[1];
             }
-            froudeRowAndCol_PrintWriter.println(
-                    i + ", " + (int) totalFroudeN + ", "
-                    + totalFroudeSum + ", " + totalFroudeMean + ", "
-                    + totalFroudeMax + ", " + froudeMaxCount + ", "
-                    + inTime + ", " + mTime + ", "
-                    + timeToMaxFroude + ", "
-                    + froudeT1Count + ", " + froudeT2Count + ", "
-                    + froudeT3Count + ", " + froudeT4Count);
+            froudeRowAndColPW.println(
+                    i + "," + (int) totalFroudeN + ","
+                    + totalFroudeSum + "," + totalFroudeMean + ","
+                    + totalFroudeMax + "," + froudeMaxCount + ","
+                    + inTime + "," + mTime + ","
+                    + timeToMaxFroude + ","
+                    + froudeT1Count + "," + froudeT2Count + ","
+                    + froudeT3Count + "," + froudeT4Count);
 
             // Check File counts
             // depth
-            int depthFileCountCheck =
-                    depthInputDirectory.listFiles().length - 1;
+            int depthFileCountCheck = depthIndir.listFiles().length - 1;
             if (depthFileCountCheck != depthFileCount) {
-                System.out.println(
-                        "depthFileCountCheck != depthFileCount");
-                System.out.println(
-                        depthFileCountCheck + "!=" + depthFileCount);
+                System.out.println("depthFileCountCheck != depthFileCount");
+                System.out.println(depthFileCountCheck + "!=" + depthFileCount);
             }
             // velocity
-            int velocityFileCountCheck =
-                    velocityInputDirectory.listFiles().length - 1;
+            int velocityFileCountCheck = velocityIndir.listFiles().length - 1;
             if (velocityFileCountCheck != velocityFileCount) {
-                System.out.println(
-                        "velocityFileCountCheck != velocityFileCount");
-                System.out.println(
-                        velocityFileCountCheck + "!=" + velocityFileCount);
+                System.out.println("velocityFileCountCheck != velocityFileCount");
+                System.out.println(velocityFileCountCheck + "!=" + velocityFileCount);
             }
             // shearStress
-            int shearStressFileCountCheck =
-                    shearStressInputDirectory.listFiles().length - 1;
+            int shearStressFileCountCheck = shearStressIndir.listFiles().length - 1;
             if (shearStressFileCountCheck != shearStressFileCount) {
-                System.out.println(
-                        "shearStressFileCountCheck != shearStressFileCount");
-                System.out.println(
-                        shearStressFileCountCheck + "!=" + shearStressFileCount);
+                System.out.println("shearStressFileCountCheck != shearStressFileCount");
+                System.out.println(shearStressFileCountCheck + "!=" + shearStressFileCount);
             }
             // froude
-            int froudeFileCountCheck =
-                    froudeInputDirectory.listFiles().length - 1;
+            int froudeFileCountCheck = froudeIndir.listFiles().length - 1;
             if (froudeFileCountCheck != froudeFileCount) {
-                System.out.println(
-                        "froudeFileCountCheck != froudeFileCount");
-                System.out.println(
-                        froudeFileCountCheck + "!=" + froudeFileCount);
+                System.out.println("froudeFileCountCheck != froudeFileCount");
+                System.out.println(froudeFileCountCheck + "!=" + froudeFileCount);
             }
         }
         // Close output channels
-        depthRowAndCol_PrintWriter.close();
-        velocityRowAndCol_PrintWriter.close();
-        shearStressRowAndCol_PrintWriter.close();
-        froudeRowAndCol_PrintWriter.close();
+        depthRowAndColPW.close();
+        velocityRowAndColPW.close();
+        shearStressRowAndColPW.close();
+        froudeRowAndColPW.close();
     }
 
     /**
@@ -1154,12 +947,12 @@ public class CrossSectionProcessing {
             String[] inundationDateTime = inundationTime.split(" ");
             String[] maxDateTime = maxTime.split(" ");
             if (inundationDateTime[0].equalsIgnoreCase(maxDateTime[0])) {
-                String[] inundationTimeHoursMins =
-                        inundationDateTime[1].split(":");
-                int inundationHour =
-                        Integer.valueOf(inundationTimeHoursMins[0]);
-                int inundationMinutes =
-                        Integer.valueOf(inundationTimeHoursMins[1]);
+                String[] inundationTimeHoursMins
+                        = inundationDateTime[1].split(":");
+                int inundationHour
+                        = Integer.valueOf(inundationTimeHoursMins[0]);
+                int inundationMinutes
+                        = Integer.valueOf(inundationTimeHoursMins[1]);
                 String[] maxTimeHoursMins = maxDateTime[1].split(":");
                 int maxHour = Integer.valueOf(maxTimeHoursMins[0]);
                 int maxMinutes = Integer.valueOf(maxTimeHoursMins[1]);
@@ -1180,34 +973,29 @@ public class CrossSectionProcessing {
      * @return an ArrayList[] result: result[0] is a list of times; result[1] is
      * a list of data values.
      */
-    public ArrayList[] readIntoArrayList(
-            File inputFile) {
-        ArrayList[] result = new ArrayList[2];
+    public ArrayList[] readIntoArrayList(File inputFile) {
+        ArrayList[] r = new ArrayList[2];
         ArrayList dataValues = new ArrayList();
         ArrayList times = new ArrayList();
-        BufferedReader a_BufferedReader;
-        StreamTokenizer a_StreamTokenizer;
         try {
-            a_BufferedReader = new BufferedReader(
-                    new InputStreamReader(
-                    new FileInputStream(inputFile)));
-            a_StreamTokenizer = new StreamTokenizer(a_BufferedReader);
-            a_StreamTokenizer.resetSyntax();
-            Generic_IO.setStreamTokenizerSyntax1(a_StreamTokenizer);
-            a_StreamTokenizer.wordChars('(', '(');
-            a_StreamTokenizer.wordChars(')', ')');
-            a_StreamTokenizer.wordChars(':', ':');
-            a_StreamTokenizer.wordChars('^', '^');
-            a_StreamTokenizer.wordChars('/', '/');
+            BufferedReader br = env.io.getBufferedReader(inputFile);
+            StreamTokenizer st = new StreamTokenizer(br);
+            st.resetSyntax();
+            env.io.setStreamTokenizerSyntax1(st);
+            st.wordChars('(', '(');
+            st.wordChars(')', ')');
+            st.wordChars(':', ':');
+            st.wordChars('^', '^');
+            st.wordChars('/', '/');
 
             String line = null;
             int lineCount = 0;
             int tokenType;
-            a_StreamTokenizer.nextToken();
+            st.nextToken();
             // Skip header
-            a_StreamTokenizer.nextToken();
-            a_StreamTokenizer.nextToken();
-            tokenType = a_StreamTokenizer.nextToken();
+            st.nextToken();
+            st.nextToken();
+            tokenType = st.nextToken();
             while (tokenType != StreamTokenizer.TT_EOF) {
                 switch (tokenType) {
                     case StreamTokenizer.TT_EOL:
@@ -1244,17 +1032,17 @@ public class CrossSectionProcessing {
                         break;
                     case StreamTokenizer.TT_WORD:
                         lineCount++;
-                        line = a_StreamTokenizer.sval;
+                        line = st.sval;
                         System.out.println("line " + lineCount + " " + line);
                         break;
                 }
-                tokenType = a_StreamTokenizer.nextToken();
+                tokenType = st.nextToken();
             }
         } catch (IOException ioe0) {
             System.err.println(ioe0.getMessage());
         }
-        result[0] = times;
-        result[1] = dataValues;
-        return result;
+        r[0] = times;
+        r[1] = dataValues;
+        return r;
     }
 }

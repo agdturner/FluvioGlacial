@@ -7,7 +7,6 @@ package uk.ac.leeds.ccg.andyt.projects.fluvialglacial;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StreamTokenizer;
@@ -23,17 +22,19 @@ import java.util.logging.Logger;
 //import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 import org.apache.commons.math.analysis.polynomials.PolynomialSplineFunction;
 import uk.ac.leeds.ccg.andyt.data.Data_BiNumeric;
-import uk.ac.leeds.ccg.andyt.generic.io.Generic_IO;
 import uk.ac.leeds.ccg.andyt.math.Math_BigDecimal;
 import uk.ac.leeds.ccg.andyt.chart.examples.Chart_Scatter;
+import uk.ac.leeds.ccg.andyt.projects.fluvialglacial.core.FG_Environment;
+import uk.ac.leeds.ccg.andyt.projects.fluvialglacial.core.FG_Object;
 
 /**
  *
  * @author geoagdt
  */
-public class SlopeAreaAnalysis {
+public class SlopeAreaAnalysis extends FG_Object {
 
-    public SlopeAreaAnalysis() {
+    public SlopeAreaAnalysis(FG_Environment e) {
+        super(e);
     }
 
     /**
@@ -41,12 +42,16 @@ public class SlopeAreaAnalysis {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        new SlopeAreaAnalysis().run();
+        new SlopeAreaAnalysis(new FG_Environment()).run();
     }
 
     private static String sComma = ",";
 
     public void run() {
+
+        // Main switches
+        boolean runSwiss = true;//false;
+        boolean runAustria = true;//false;
 
         int minNumberOfDataPoints = 10;
 
@@ -54,72 +59,36 @@ public class SlopeAreaAnalysis {
         //projectDir = new File("/scratch02/JonathanCarrivick/SlopeArea/");
         projectDir = new File("C:\\Users\\geoagdt\\projects\\JonathanCarrivick");
 
-        File dirIn;
-        dirIn = new File(
-                projectDir,
-                "input");
-        File dirOut;
-        dirOut = new File(
-                projectDir,
-                "output");
-        File austriaDirOut;
-        austriaDirOut = new File(
-                dirOut,
-                "austria");
-        File swissDirOut;
-        swissDirOut = new File(
-                dirOut,
-                "swiss");
-
-        File swissFileIn;
-        swissFileIn = new File(
-                dirIn,
-                "slope_area2.csv");
-        File austriaFileIn;
-        austriaFileIn = new File(
-                dirIn,
-                "Austria_proglac_export.txt");
-
-        File swissFileOut2;
-        swissFileOut2 = new File(
-                swissDirOut,
-                //"SwissID_LogSlope.txt");
-                "SwissID_Slope.txt");
-        File austriaFileOut2;
-        austriaFileOut2 = new File(
-                austriaDirOut,
-                //"AustriaID_LogSlope.txt");
-                "AustriaID_Slope.txt");
-
-//        System.out.println("Swiss");
-//        TreeMap<Integer, Object[]> swissData = readSwissData(swissFileIn);
-//        PrintDataSummary(swissData);
-//        run(swissData,
-//                swissDirOut,
-//                swissFileOut2,
-//                minNumberOfDataPoints);
-
-        System.out.println("Austria");
-        TreeMap<Integer, Object[]> austriaData = readAustriaData(austriaFileIn);
-        PrintDataSummary(austriaData);
-        run(austriaData,
-                austriaDirOut,
-                austriaFileOut2,
-                minNumberOfDataPoints);
+        File dirIn = new File(projectDir, "input");
+        File dirOut = new File(projectDir, "output");
+        if (runSwiss) {
+            File swissDirOut = new File(dirOut, "swiss");
+            File swissFileIn = new File(dirIn, "slope_area2.csv");
+            File swissFileOut2 = new File(swissDirOut,
+                    //"SwissID_LogSlope.txt");
+                    "SwissID_Slope.txt");
+            System.out.println("Swiss");
+            TreeMap<Integer, Object[]> swissData = readSwissData(swissFileIn);
+            PrintDataSummary(swissData);
+            run(swissData, swissDirOut, swissFileOut2, minNumberOfDataPoints);
+        }
+        if (runAustria) {
+            File austriaDirOut = new File(dirOut, "austria");
+            File austriaFileIn = new File(dirIn, "Austria_proglac_export.txt");
+            File austriaFileOut2 = new File(austriaDirOut,
+                    //"AustriaID_LogSlope.txt");
+                    "AustriaID_Slope.txt");
+            System.out.println("Austria");
+            TreeMap<Integer, Object[]> austriaData = readAustriaData(austriaFileIn);
+            PrintDataSummary(austriaData);
+            run(austriaData, austriaDirOut, austriaFileOut2, minNumberOfDataPoints);
+        }
     }
 
-    public void run(
-            TreeMap<Integer, Object[]> allData,
-            File outDir,
-            File outFile2,
-            int minNumberOfDataPoints) {
+    public void run(TreeMap<Integer, Object[]> allData, File outDir,
+            File outFile2, int minNumberOfDataPoints) {
         File outfile;
-        PrintWriter pw = null;
-        try {
-            pw = new PrintWriter(outFile2);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(SlopeAreaAnalysis.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        PrintWriter pw = env.io.getPrintWriter(outFile2, false);
         //pw.println("ID, log(Slope)");
         pw.println("ID, Slope");
         int dataWidth = 500;//400;//250;
@@ -137,7 +106,7 @@ public class SlopeAreaAnalysis {
 
         String format = "PNG";
         String title;
-        
+
         Iterator<Integer> ite;
         ite = allData.keySet().iterator();
         int ID;
@@ -191,21 +160,20 @@ public class SlopeAreaAnalysis {
             pw.flush();
             //}
         }
-                pw.close();
+        pw.close();
     }
 
     protected TreeMap<Integer, Object[]> readSwissData(File fileIn) {
         TreeMap<Integer, Object[]> result;
         result = new TreeMap<Integer, Object[]>();
-        BufferedReader br;
-        br = Generic_IO.getBufferedReader(fileIn);
+        BufferedReader br = env.io.getBufferedReader(fileIn);
         StreamTokenizer st;
         st = new StreamTokenizer(br);
-        Generic_IO.setStreamTokenizerSyntax5(st);
+        env.io.setStreamTokenizerSyntax5(st);
         st.wordChars('(', '(');
         st.wordChars(')', ')');
         st.wordChars('%', '%');
-        Generic_IO.skipline(st);
+        env.io.skipline(st);
         int token;
         String line = "";
         String[] fields;
@@ -266,7 +234,7 @@ public class SlopeAreaAnalysis {
                                 slope = BigDecimal.ZERO;
                             }
                             Data_BiNumeric point;
-                            point = new Data_BiNumeric(                                    slope,                                    area);
+                            point = new Data_BiNumeric(slope, area);
                             theGeneric_XYNumericalData.add(point);
                             data[0] = theGeneric_XYNumericalData;
                             data[1] = maxx.max(slope);
@@ -291,14 +259,14 @@ public class SlopeAreaAnalysis {
         TreeMap<Integer, Object[]> result;
         result = new TreeMap<Integer, Object[]>();
         BufferedReader br;
-        br = Generic_IO.getBufferedReader(fileIn);
+        br = env.io.getBufferedReader(fileIn);
         StreamTokenizer st;
         st = new StreamTokenizer(br);
-        Generic_IO.setStreamTokenizerSyntax5(st);
+        env.io.setStreamTokenizerSyntax5(st);
         st.wordChars('(', '(');
         st.wordChars(')', ')');
         st.wordChars('%', '%');
-        Generic_IO.skipline(st);
+        env.io.skipline(st);
         int token;
         String line = "";
         String[] fields;
@@ -359,7 +327,7 @@ public class SlopeAreaAnalysis {
                                 slope = BigDecimal.ZERO;
                             }
                             Data_BiNumeric point;
-                            point = new Data_BiNumeric(                                    slope,                                    area);
+                            point = new Data_BiNumeric(slope, area);
                             theGeneric_XYNumericalData.add(point);
                             data[0] = theGeneric_XYNumericalData;
                             data[1] = maxx.max(slope);
