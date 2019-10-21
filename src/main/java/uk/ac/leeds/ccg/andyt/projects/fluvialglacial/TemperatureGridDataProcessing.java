@@ -25,6 +25,7 @@ import java.math.RoundingMode;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.TreeMap;
+import uk.ac.leeds.ccg.andyt.generic.core.Generic_Environment;
 import uk.ac.leeds.ccg.andyt.math.Math_BigDecimal;
 import uk.ac.leeds.ccg.andyt.grids.core.grid.stats.Grids_AbstractGridNumberStats;
 import uk.ac.leeds.ccg.andyt.grids.core.grid.Grids_GridDouble;
@@ -45,10 +46,9 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
     String[] ImageTypes;
     Grids_ESRIAsciiGridExporter ESRIAsciiGridExporter;
 
-    protected TemperatureGridDataProcessing() {
-    }
-
-    public TemperatureGridDataProcessing(Grids_Environment ge) {
+//    protected TemperatureGridDataProcessing() {
+//    }
+    public TemperatureGridDataProcessing(Grids_Environment ge) throws IOException {
         super(ge);
     }
 
@@ -61,7 +61,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
      */
     public static void main(String[] args) {
         try {
-            File directory;
+            File dir;
             if (args.length > 1) {
                 throw new IllegalArgumentException("Expecting only one or no "
                         + "arguments. The argument is meant to be a directory "
@@ -69,16 +69,16 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             }
             if (args.length == 0) {
                 String userdir = System.getProperty("user.dir");
-                directory = new File(userdir);
+                dir = new File(userdir);
             } else {
-                directory = new File(args[0]);
+                dir = new File(args[0]);
             }
-            if (!directory.exists()) {
-                throw new IOException("Directory " + directory + " does not "
+            if (!dir.exists()) {
+                throw new IOException("Directory " + dir + " does not "
                         + "exist");
             }
             Grids_Environment ge;
-            ge = new Grids_Environment(directory);
+            ge = new Grids_Environment(new Generic_Environment(dir), dir);
             //File directory = new File( "/scratch01/Work/Projects/"
             //            + "StreamTemperatureGridGeneralisation/workspace/");
             new TemperatureGridDataProcessing(ge).run();
@@ -99,22 +99,23 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
         runAugust(intervalRange, startIntervalBound);
     }
 
-    public void runTest(double intervalRange, double startIntervalBound) {
+    public void runTest(double intervalRange, double startIntervalBound) 
+            throws IOException {
         String month = "August";
-        File inDir = new File(Files.getInputDataDir().getAbsolutePath() + month + "/");
+        File inDir = new File(env.files.getInputDir().getAbsolutePath() + month + "/");
         File outDir = getOutputFile(intervalRange, startIntervalBound, month);
         File inputFile = new File(inDir, "27t1700.txt");
         getStatistics(inputFile, intervalRange, startIntervalBound, outDir);
     }
 
     public File getOutputFile(double intervalRange, double startIntervalBound, String month) {
-        return new File(Files.getOutputDataDir().getAbsolutePath()
+        return new File(env.files.getOutputDir().getAbsolutePath()
                 + intervalRange + "_" + startIntervalBound + "/" + month + "/");
     }
 
-    public void runJuly(double intervalRange, double startIntervalBound) {
+    public void runJuly(double intervalRange, double startIntervalBound) throws IOException {
         String month = "July";
-        File inputDirectory = new File(Files.getInputDataDir().getAbsolutePath() + month);
+        File inputDirectory = new File(env.files.getInputDir().getAbsolutePath() + month);
         File outputDirectory = getOutputFile(intervalRange, startIntervalBound, month);
         outputDirectory.mkdirs();
         PrintWriter outputPW = env.env.io.getPrintWriter(new File(outputDirectory, month + ".csv"), false);
@@ -190,9 +191,10 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
         outputPW.close();
     }
 
-    public void runAugust(double intervalRange, double startIntervalBound) {
+    public void runAugust(double intervalRange, double startIntervalBound) 
+            throws IOException {
         String month = "August";
-        File inputDirectory = new File(Files.getInputDataDir().getAbsolutePath() + month);
+        File inputDirectory = new File(env.files.getInputDir().getAbsolutePath() + month);
         File outputDirectory = getOutputFile(intervalRange, startIntervalBound, month);
         outputDirectory.mkdirs();
         PrintWriter outputPW = env.env.io.getPrintWriter(new File(outputDirectory, month + ".csv"), false);
@@ -301,18 +303,16 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
      * maximumDiversityOverIntervalsInObservedRange result[31] =
      * dominanceOverIntervalsInObservedRange
      */
-    public Object[] getStatistics(
-            File inputFile,
-            double intervalRange,
-            double startIntervalBound,
-            File outputDirectory) {
-        RoundingMode roundingMode = RoundingMode.HALF_UP;
+    public Object[] getStatistics(File inputFile, double intervalRange,
+            double startIntervalBound, File outputDirectory) 
+            throws IOException {
+        RoundingMode rm = RoundingMode.HALF_UP;
         int numberOfOutputs = 32;
         Object[] result = new Object[numberOfOutputs];
         int outputIndex = 0;
         File dirGen;
-        dirGen = new File(env.getDirectory(), "generated");
-        File dir = new File(env.getFiles().getGeneratedGridDoubleDir(), inputFile.getName());
+        dirGen = new File(env.files.getDir(), "generated");
+        File dir = new File(env.files.getGeneratedGridDoubleDir(), inputFile.getName());
         Grids_GridDouble g;
         g = (Grids_GridDouble) GridDoubleFactory.create(dir, inputFile);
         Grids_AbstractGridNumberStats gStatistics;
@@ -341,7 +341,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
         result[outputIndex] = standardDeviation.doubleValue();
         outputIndex++;
         BigDecimal sum;
-        sum = stats.getSum().setScale(ten, roundingMode);
+        sum = stats.getSum().setScale(ten, rm);
         System.out.println("sum " + sum.toString());
         result[outputIndex] = sum.doubleValue();
         outputIndex++;
@@ -444,7 +444,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
             BigDecimal n_BigDecimal = new BigDecimal(n);
             BigDecimal meanIgnoringZeroAndOne_BigDecimal
                     = sumIgnoringOne_BigDecimal.divide(
-                            n_BigDecimal, ten, roundingMode);
+                            n_BigDecimal, ten, rm);
             System.out.println("mean ignoring values of 0 and 1 "
                     + meanIgnoringZeroAndOne_BigDecimal.doubleValue());
             result[outputIndex] = meanIgnoringZeroAndOne_BigDecimal;
@@ -531,20 +531,20 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
                 }
             }
             System.out.println("</CellValues with counts>");
-            moment1 = moment1.divide(n_BigDecimal, ten, roundingMode);
-            System.out.println("moment1 " + moment1.setScale(ten, roundingMode));
+            moment1 = moment1.divide(n_BigDecimal, ten, rm);
+            System.out.println("moment1 " + moment1.setScale(ten, rm));
             result[outputIndex] = moment1.doubleValue();
             outputIndex++;
-            moment2 = moment2.divide(n_BigDecimal, ten, roundingMode);
-            System.out.println("moment2 " + moment2.setScale(ten, roundingMode));
+            moment2 = moment2.divide(n_BigDecimal, ten, rm);
+            System.out.println("moment2 " + moment2.setScale(ten, rm));
             result[outputIndex] = moment2.doubleValue();
             outputIndex++;
-            moment3 = moment3.divide(n_BigDecimal, ten, roundingMode);
-            System.out.println("moment3 " + moment3.setScale(ten, roundingMode));
+            moment3 = moment3.divide(n_BigDecimal, ten, rm);
+            System.out.println("moment3 " + moment3.setScale(ten, rm));
             result[outputIndex] = moment3.doubleValue();
             outputIndex++;
-            moment4 = moment4.divide(n_BigDecimal, ten, roundingMode);
-            System.out.println("moment4 " + moment4.setScale(ten, roundingMode));
+            moment4 = moment4.divide(n_BigDecimal, ten, rm);
+            System.out.println("moment4 " + moment4.setScale(ten, rm));
             result[outputIndex] = moment4.doubleValue();
             outputIndex++;
 
@@ -559,21 +559,21 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
                     moment2,
                     Math_BigDecimal.HALF,
                     ten,
-                    roundingMode);
+                    rm);
             BigDecimal skewnessDenominator = sqrt_moment2.multiply(moment2);
             BigDecimal skewness
-                    = moment3.divide(skewnessDenominator, 100, roundingMode);
+                    = moment3.divide(skewnessDenominator, 100, rm);
             System.out.println("skewness "
-                    + skewness.setScale(ten, roundingMode));
+                    + skewness.setScale(ten, rm));
             result[outputIndex] = skewness.doubleValue();
             outputIndex++;
 
             BigDecimal kurtosisDenominatorPart = moment2.multiply(moment2);
             BigDecimal kurtosis
-                    = (moment4.divide(kurtosisDenominatorPart, 100, roundingMode))
+                    = (moment4.divide(kurtosisDenominatorPart, 100, rm))
                             .subtract(new BigDecimal("3"));
             System.out.println("kurtosis "
-                    + kurtosis.setScale(ten, roundingMode));
+                    + kurtosis.setScale(ten, rm));
             result[outputIndex] = kurtosis.doubleValue();
             outputIndex++;
             long variety = valueCountMap.size();
@@ -606,10 +606,10 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
                 mode = BigDecimal.ZERO;
             } else {
                 BigDecimal divisor = new BigDecimal("" + mode_HashSet.size());
-                mode = modeSum.divide(divisor, 100, roundingMode);
+                mode = modeSum.divide(divisor, 100, rm);
             }
             System.out.println("mode "
-                    + mode.setScale(ten, roundingMode).toString());
+                    + mode.setScale(ten, rm).toString());
             result[outputIndex] = mode.doubleValue();
             outputIndex++;
 
@@ -675,7 +675,7 @@ public class TemperatureGridDataProcessing extends Grids_ProcessorDEM {
                 BigDecimal divisor = new BigDecimal(
                         "" + modeInterval_HashSet.size());
                 modeInterval = modeIntervalSum.divide(
-                        divisor, ten, roundingMode);
+                        divisor, ten, rm);
             }
             System.out.println("modeInterval " + modeInterval.toString());
             // Mean of the values in the mode intervals might be a better than 

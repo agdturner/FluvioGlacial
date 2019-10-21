@@ -41,8 +41,11 @@ public class SlopeAreaAnalysis extends FG_Object {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
-        new SlopeAreaAnalysis(new FG_Environment()).run();
+        try {
+            new SlopeAreaAnalysis(new FG_Environment()).run();
+        } catch (IOException ex) {
+            ex.printStackTrace(System.err);
+        }
     }
 
     private static String sComma = ",";
@@ -88,7 +91,7 @@ public class SlopeAreaAnalysis extends FG_Object {
     public void run(TreeMap<Integer, Object[]> allData, File outDir,
             File outFile2, int minNumberOfDataPoints) {
         File outfile;
-        PrintWriter pw = env.io.getPrintWriter(outFile2, false);
+        PrintWriter pw = env.env.io.getPrintWriter(outFile2, false);
         //pw.println("ID, log(Slope)");
         pw.println("ID, Slope");
         int dataWidth = 500;//400;//250;
@@ -165,15 +168,15 @@ public class SlopeAreaAnalysis extends FG_Object {
 
     protected TreeMap<Integer, Object[]> readSwissData(File fileIn) {
         TreeMap<Integer, Object[]> result;
-        result = new TreeMap<Integer, Object[]>();
-        BufferedReader br = env.io.getBufferedReader(fileIn);
+        result = new TreeMap<>();
+        BufferedReader br = env.env.io.getBufferedReader(fileIn);
         StreamTokenizer st;
         st = new StreamTokenizer(br);
-        env.io.setStreamTokenizerSyntax5(st);
+        env.env.io.setStreamTokenizerSyntax5(st);
         st.wordChars('(', '(');
         st.wordChars(')', ')');
         st.wordChars('%', '%');
-        env.io.skipline(st);
+        env.env.io.skipline(st);
         int token;
         String line = "";
         String[] fields;
@@ -257,16 +260,16 @@ public class SlopeAreaAnalysis extends FG_Object {
 
     protected TreeMap<Integer, Object[]> readAustriaData(File fileIn) {
         TreeMap<Integer, Object[]> result;
-        result = new TreeMap<Integer, Object[]>();
+        result = new TreeMap<>();
         BufferedReader br;
-        br = env.io.getBufferedReader(fileIn);
+        br = env.env.io.getBufferedReader(fileIn);
         StreamTokenizer st;
         st = new StreamTokenizer(br);
-        env.io.setStreamTokenizerSyntax5(st);
+        env.env.io.setStreamTokenizerSyntax5(st);
         st.wordChars('(', '(');
         st.wordChars(')', ')');
         st.wordChars('%', '%');
-        env.io.skipline(st);
+        env.env.io.skipline(st);
         int token;
         String line = "";
         String[] fields;

@@ -137,7 +137,7 @@ public class CrossSectionProcessing extends FG_Object {
         File depthRowAndColOutdir = new File(depthOutdir, "rowAndColGeneralisation");
         depthRowAndColOutdir.mkdirs();
         File depthRowAndColOutfile = new File(depthRowAndColOutdir, "depth.csv");
-        PrintWriter depthRowAndColPW = env.io.getPrintWriter(depthRowAndColOutfile, false);
+        PrintWriter depthRowAndColPW = env.env.io.getPrintWriter(depthRowAndColOutfile, false);
         // Depth thesholds 4, 6, 8, 10
         String header0 = "Cross Section Number,Total N,Total Sum,Mean,Max,"
                 + "MaxCount,Inundation Time Max Column,Max Time,Time to Max,";
@@ -155,7 +155,7 @@ public class CrossSectionProcessing extends FG_Object {
         File velocityRowAndColOutdir = new File(velocityOutdir, "rowAndColGeneralisation");
         velocityRowAndColOutdir.mkdirs();
         File velocityRowAndColOutfile = new File(velocityRowAndColOutdir, "velocity.csv");
-        PrintWriter velocityRowAndColPW = env.io.getPrintWriter(velocityRowAndColOutfile, false);
+        PrintWriter velocityRowAndColPW = env.env.io.getPrintWriter(velocityRowAndColOutfile, false);
         // velocity thesholds 4, 6, 8, 10
         velocityRowAndColPW.println(header0 + header1);
 
@@ -169,7 +169,7 @@ public class CrossSectionProcessing extends FG_Object {
         File shearStressRowAndColOutdir = new File(shearStressOutdir, "rowAndColGeneralisation");
         shearStressRowAndColOutdir.mkdirs();
         File shearStressRowAndColOutfile = new File(shearStressRowAndColOutdir, "shear stress.csv");
-        PrintWriter shearStressRowAndColPW = env.io.getPrintWriter(shearStressRowAndColOutfile, false);
+        PrintWriter shearStressRowAndColPW = env.env.io.getPrintWriter(shearStressRowAndColOutfile, false);
         // shearStress thesholds 200, 1000, 2500, 5000
         shearStressRowAndColPW.println(header0 + "Number of values > 200,"
                 + "Number of values > 1000,Number of values > 2500,"
@@ -185,7 +185,7 @@ public class CrossSectionProcessing extends FG_Object {
         File froudeRowAndColOutdir = new File(froudeOutdir, "rowAndColGeneralisation");
         froudeRowAndColOutdir.mkdirs();
         File froudeRowAndColOutfile = new File(froudeRowAndColOutdir, "froude.csv");
-        PrintWriter froudeRowAndColPW = env.io.getPrintWriter(froudeRowAndColOutfile, false);
+        PrintWriter froudeRowAndColPW = env.env.io.getPrintWriter(froudeRowAndColOutfile, false);
         // froude thesholds 0.8, 0.9, 1.0, 1.1
         froudeRowAndColPW.println(header0 + "Number of values > 0.8,"
                 + "Number of values > 0.9,Number of values > 1.0,"
@@ -308,7 +308,7 @@ public class CrossSectionProcessing extends FG_Object {
 
             // depth
             File depthRowOutfile = new File(depthRowOutdir, "depth " + i + ".csv");
-            PrintWriter depthRowPW = env.io.getPrintWriter(depthRowOutfile, false);
+            PrintWriter depthRowPW = env.env.io.getPrintWriter(depthRowOutfile, false);
             depthRowPW.println("n,sum,mean,max");
             for (int rowIndex = 0; rowIndex < depthNumberOfRows; rowIndex++) {
                 double[] row = (double[]) depthDataValues.get(rowIndex);
@@ -373,7 +373,7 @@ public class CrossSectionProcessing extends FG_Object {
 
             // velocity
             File velocityRowOutfile = new File(velocityRowOutdir, "velocity " + i + ".csv");
-            PrintWriter velocityRowPW = env.io.getPrintWriter(velocityRowOutfile, false);
+            PrintWriter velocityRowPW = env.env.io.getPrintWriter(velocityRowOutfile, false);
             velocityRowPW.println("n,sum,mean,max");
             for (int rowIndex = 0; rowIndex < velocityNumberOfRows; rowIndex++) {
                 double[] row = (double[]) velocityDataValues.get(rowIndex);
@@ -439,7 +439,7 @@ public class CrossSectionProcessing extends FG_Object {
 
             // shear stress
             File shearStressRowOutfile = new File(shearStressRowOutdir, "shear stress " + i + ".csv");
-            PrintWriter shearStressRowPW = env.io.getPrintWriter(shearStressRowOutfile, false);
+            PrintWriter shearStressRowPW = env.env.io.getPrintWriter(shearStressRowOutfile, false);
             shearStressRowPW.println("n,sum,mean,max");
             for (int rowIndex = 0; rowIndex < shearStressNumberOfRows; rowIndex++) {
                 double[] row = (double[]) shearStressDataValues.get(rowIndex);
@@ -505,7 +505,7 @@ public class CrossSectionProcessing extends FG_Object {
 
             // froude
             File froudeRowOutfile = new File(froudeRowOutdir, "froude " + i + ".csv");
-            PrintWriter froudeRowPW = env.io.getPrintWriter(froudeRowOutfile, false);
+            PrintWriter froudeRowPW = env.env.io.getPrintWriter(froudeRowOutfile, false);
             froudeRowPW.println("n,sum,mean,max");
             for (int rowIndex = 0; rowIndex < froudeNumberOfRows; rowIndex++) {
                 double[] row = (double[]) froudeDataValues.get(rowIndex);
@@ -572,7 +572,7 @@ public class CrossSectionProcessing extends FG_Object {
             // Column Processing
             // depth
             File depthColOutfile = new File(depthColOutdir, "depth " + i + ".csv");
-            PrintWriter depthColPW = env.io.getPrintWriter(depthColOutfile, false);
+            PrintWriter depthColPW = env.env.io.getPrintWriter(depthColOutfile, false);
             String header3 = "Cross Section Column,Inundation Time,Time at Max,Time To Max,Max";
             depthColPW.println(header3);
             int numberOfCols = ((double[]) depthDataValues.get(0)).length;
@@ -633,7 +633,7 @@ public class CrossSectionProcessing extends FG_Object {
 
             // velocity
             File velocityColOutfile = new File(velocityColOutdir, "velocity " + i + ".csv");
-            PrintWriter velocityColPW = env.io.getPrintWriter(velocityColOutfile, false);
+            PrintWriter velocityColPW = env.env.io.getPrintWriter(velocityColOutfile, false);
             velocityColPW.println(header3);
             numberOfCols = ((double[]) velocityDataValues.get(0)).length;
             columnMax = new double[numberOfCols];
@@ -694,7 +694,7 @@ public class CrossSectionProcessing extends FG_Object {
 
             // shearStress
             File shearStressColOutfile = new File(shearStressColOutdir, "shear stress " + i + ".csv");
-            PrintWriter shearStressColPW = env.io.getPrintWriter(shearStressColOutfile, false);
+            PrintWriter shearStressColPW = env.env.io.getPrintWriter(shearStressColOutfile, false);
             shearStressColPW.println(header3);
             numberOfCols = ((double[]) shearStressDataValues.get(0)).length;
             columnMax = new double[numberOfCols];
@@ -758,7 +758,7 @@ public class CrossSectionProcessing extends FG_Object {
 
             // froude
             File froudeColOutfile = new File(froudeColOutdir, "froude " + i + ".csv");
-            PrintWriter froudeColPW = env.io.getPrintWriter(froudeColOutfile, false);
+            PrintWriter froudeColPW = env.env.io.getPrintWriter(froudeColOutfile, false);
             froudeColPW.println(header3);
             numberOfCols = ((double[]) froudeDataValues.get(0)).length;
             columnMax = new double[numberOfCols];
@@ -978,10 +978,10 @@ public class CrossSectionProcessing extends FG_Object {
         ArrayList dataValues = new ArrayList();
         ArrayList times = new ArrayList();
         try {
-            BufferedReader br = env.io.getBufferedReader(inputFile);
+            BufferedReader br = env.env.io.getBufferedReader(inputFile);
             StreamTokenizer st = new StreamTokenizer(br);
             st.resetSyntax();
-            env.io.setStreamTokenizerSyntax1(st);
+            env.env.io.setStreamTokenizerSyntax1(st);
             st.wordChars('(', '(');
             st.wordChars(')', ')');
             st.wordChars(':', ':');

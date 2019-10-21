@@ -15,14 +15,23 @@
  */
 package uk.ac.leeds.ccg.andyt.projects.fluvialglacial.core;
 
+import java.io.IOException;
 import uk.ac.leeds.ccg.andyt.generic.core.Generic_Environment;
 
 /**
  *
  * @author geoagdt
  */
-public class FG_Environment extends Generic_Environment {
+public class FG_Environment {
     
-    public FG_Environment(){}
+    public transient final Generic_Environment env;
+    
+    public FG_Environment() throws IOException {
+        this (new Generic_Environment());
+    }
+    
+    public FG_Environment(Generic_Environment e){
+        this.env = e;
+    }
     
 }
