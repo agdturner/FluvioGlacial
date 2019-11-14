@@ -123,7 +123,7 @@ public class CrossSectionProcessing extends FG_Object {
      * @param end A numerical name for the last cross section
      * @param increment A numerical increment for the cross sections
      */
-    public void process(int start, int end, int increment) {
+    public void process(int start, int end, int increment) throws IOException {
         File indir = new File(dir.getParentFile() + "/input/MODEL OUTPUT/");
         File outdir = new File(dir.getParentFile() + "/output/MODEL OUTPUT/");
 

@@ -9,7 +9,8 @@ import uk.ac.leeds.ccg.andyt.generic.core.Generic_Strings;
 
 /**
  *
- * @author geoagdt
+ * @author Andy Turner
+ * @version 1.0.0
  */
 public class FG_Strings extends Generic_Strings {
  

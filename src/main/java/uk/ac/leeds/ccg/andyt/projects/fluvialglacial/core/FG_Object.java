@@ -19,7 +19,8 @@ import java.io.Serializable;
 
 /**
  *
- * @author geoagdt
+ * @author Andy Turner
+ * @version 1.0.0
  */
 public class FG_Object implements Serializable {
     

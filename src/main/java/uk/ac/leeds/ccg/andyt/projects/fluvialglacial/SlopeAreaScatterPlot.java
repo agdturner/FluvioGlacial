@@ -15,10 +15,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import org.apache.commons.math3.analysis.polynomials.PolynomialFunction;
-import uk.ac.leeds.ccg.andyt.data.Data_BiNumeric;
+import uk.ac.leeds.ccg.andyt.chart.data.Data_BiBigDecimal;
 import uk.ac.leeds.ccg.andyt.chart.examples.Chart_Scatter;
 import org.apache.commons.math3.fitting.PolynomialCurveFitter;
 import org.apache.commons.math3.fitting.WeightedObservedPoints;
+import uk.ac.leeds.ccg.andyt.generic.core.Generic_Environment;
 import uk.ac.leeds.ccg.andyt.math.Math_BigDecimal;
 //import org.apache.commons.math3.fitting.PolynomialCurveFitter
 
@@ -35,11 +36,12 @@ public class SlopeAreaScatterPlot extends Chart_Scatter {
     public double xAtMaxy2;
 
     //private final Object[] data;
-    public SlopeAreaScatterPlot() {
+    public SlopeAreaScatterPlot(Generic_Environment e) {
+        super(e);
         //data = new Object[5];
     }
 
-    public SlopeAreaScatterPlot(
+    public SlopeAreaScatterPlot(Generic_Environment e,
             int degree,
             Object[] data,
             ExecutorService executorService,
@@ -53,7 +55,8 @@ public class SlopeAreaScatterPlot extends Chart_Scatter {
             boolean drawOriginLinesOnPlot,
             int decimalPlacePrecisionForCalculations,
             int decimalPlacePrecisionForDisplay,
-            RoundingMode aRoundingMode) {
+            RoundingMode rm) {
+        super(e);
         init(
                 executorService,
                 file,
@@ -66,17 +69,17 @@ public class SlopeAreaScatterPlot extends Chart_Scatter {
                 drawOriginLinesOnPlot,
                 decimalPlacePrecisionForCalculations,
                 decimalPlacePrecisionForDisplay,
-                aRoundingMode);
+                rm);
         setStartAgeOfEndYearInterval(0);
         setData(data);
         PolynomialCurveFitter pcf;
         pcf = PolynomialCurveFitter.create(degree);
         final WeightedObservedPoints obs = new WeightedObservedPoints();
-        ArrayList<Data_BiNumeric> theData_BiNumeric;
-        theData_BiNumeric = (ArrayList<Data_BiNumeric>) data[0];
-        Iterator<Data_BiNumeric> ite;
-        ite = theData_BiNumeric.iterator();
-        Data_BiNumeric generic_XYNumericalData;
+        ArrayList<Data_BiBigDecimal> theData_BiBigDecimal;
+        theData_BiBigDecimal = (ArrayList<Data_BiBigDecimal>) data[0];
+        Iterator<Data_BiBigDecimal> ite;
+        ite = theData_BiBigDecimal.iterator();
+        Data_BiBigDecimal generic_XYNumericalData;
         while (ite.hasNext()) {
             generic_XYNumericalData = ite.next();
             obs.add(generic_XYNumericalData.x.doubleValue(),
@@ -95,7 +98,7 @@ public class SlopeAreaScatterPlot extends Chart_Scatter {
             coeffBD = Math_BigDecimal.roundToAndSetDecimalPlaces(
                     BigDecimal.valueOf(coeffs[i]),
                     decimalPlacePrecisionForDisplay,
-                    aRoundingMode);
+                    rm);
             coeffS = coeffBD.toPlainString();
             String s;
             s = getCoeff(coeffBD, coeffS);
@@ -138,7 +141,7 @@ public class SlopeAreaScatterPlot extends Chart_Scatter {
 
         double x;
         double y;
-        bestfit = new ArrayList<Data_BiNumeric>();
+        bestfit = new ArrayList<Data_BiBigDecimal>();
         for (int i = 0; i < 100; i++) {
             x = minx + interval * i;
             y = pf.value(x);
@@ -146,7 +149,7 @@ public class SlopeAreaScatterPlot extends Chart_Scatter {
                 maxy = y;
                 xAtMaxy = x;
             }
-            generic_XYNumericalData = new Data_BiNumeric(
+            generic_XYNumericalData = new Data_BiBigDecimal(
                     BigDecimal.valueOf(x),
                     BigDecimal.valueOf(y));
             bestfit.add(generic_XYNumericalData);
@@ -163,7 +166,7 @@ public class SlopeAreaScatterPlot extends Chart_Scatter {
 
         double SRMSE = 0.0d;
         double deltay;
-        ite = theData_BiNumeric.iterator();
+        ite = theData_BiBigDecimal.iterator();
         while (ite.hasNext()) {
             generic_XYNumericalData = ite.next();
             x = generic_XYNumericalData.x.doubleValue();
@@ -171,15 +174,15 @@ public class SlopeAreaScatterPlot extends Chart_Scatter {
             deltay = Math.sqrt(Math.pow(y - pf.value(x), 2));
             SRMSE += deltay;
         }
-        double MRMSE = SRMSE / (double) theData_BiNumeric.size();
+        double MRMSE = SRMSE / (double) theData_BiBigDecimal.size();
         title += ", MRMSE = " + (Math_BigDecimal.roundToAndSetDecimalPlaces(
                 BigDecimal.valueOf(MRMSE),
                 decimalPlacePrecisionForDisplay,
-                aRoundingMode)).toPlainString();
+                rm)).toPlainString();
         //setTitle(title);
     }
 
-    ArrayList<Data_BiNumeric> bestfit;
+    ArrayList<Data_BiBigDecimal> bestfit;
 
     /**
      * @param args the command line arguments
@@ -191,8 +194,8 @@ public class SlopeAreaScatterPlot extends Chart_Scatter {
     @Override
     public void drawData() {
         super.drawData();
-        Iterator<Data_BiNumeric> ite = bestfit.iterator();
-        Data_BiNumeric generic_XYNumericalData;
+        Iterator<Data_BiBigDecimal> ite = bestfit.iterator();
+        Data_BiBigDecimal generic_XYNumericalData;
         Point2D aPoint2D = null;
         if (ite.hasNext()) {
             generic_XYNumericalData = ite.next();

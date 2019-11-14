@@ -20,7 +20,8 @@ import uk.ac.leeds.ccg.andyt.generic.core.Generic_Environment;
 
 /**
  *
- * @author geoagdt
+ * @author Andy Turner
+ * @version 1.0.0
  */
 public class FG_Environment {
     

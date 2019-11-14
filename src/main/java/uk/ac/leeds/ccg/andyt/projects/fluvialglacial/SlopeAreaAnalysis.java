@@ -7,6 +7,7 @@ package uk.ac.leeds.ccg.andyt.projects.fluvialglacial;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StreamTokenizer;
@@ -20,10 +21,10 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 //import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
-import org.apache.commons.math.analysis.polynomials.PolynomialSplineFunction;
-import uk.ac.leeds.ccg.andyt.data.Data_BiNumeric;
+//import org.apache.commons.math.analysis.polynomials.PolynomialSplineFunction;
+import uk.ac.leeds.ccg.andyt.chart.data.Data_BiBigDecimal;
 import uk.ac.leeds.ccg.andyt.math.Math_BigDecimal;
-import uk.ac.leeds.ccg.andyt.chart.examples.Chart_Scatter;
+//import uk.ac.leeds.ccg.andyt.chart.examples.Chart_Scatter;
 import uk.ac.leeds.ccg.andyt.projects.fluvialglacial.core.FG_Environment;
 import uk.ac.leeds.ccg.andyt.projects.fluvialglacial.core.FG_Object;
 
@@ -50,7 +51,7 @@ public class SlopeAreaAnalysis extends FG_Object {
 
     private static String sComma = ",";
 
-    public void run() {
+    public void run() throws FileNotFoundException, IOException {
 
         // Main switches
         boolean runSwiss = true;//false;
@@ -89,7 +90,7 @@ public class SlopeAreaAnalysis extends FG_Object {
     }
 
     public void run(TreeMap<Integer, Object[]> allData, File outDir,
-            File outFile2, int minNumberOfDataPoints) {
+            File outFile2, int minNumberOfDataPoints) throws IOException {
         File outfile;
         PrintWriter pw = env.env.io.getPrintWriter(outFile2, false);
         //pw.println("ID, log(Slope)");
@@ -119,10 +120,9 @@ public class SlopeAreaAnalysis extends FG_Object {
             //if (ID == 388) {
 
             data = allData.get(ID);
-            ArrayList<Data_BiNumeric> theGeneric_XYNumericalData;
-            theGeneric_XYNumericalData = (ArrayList<Data_BiNumeric>) data[0];
+            ArrayList<Data_BiBigDecimal> xy = (ArrayList<Data_BiBigDecimal>) data[0];
             int np;
-            np = theGeneric_XYNumericalData.size();
+            np = xy.size();
             for (int degree = 2; degree < 3; degree++) {
                 title = "GlacierID " + ID + ", n = " + np;
                 //title += ", degree = " + degree;
@@ -134,7 +134,7 @@ public class SlopeAreaAnalysis extends FG_Object {
                         outDir2,
                         "SlopeUAAScatterPlot" + ID + ".PNG");
                 if (np >= minNumberOfDataPoints) {
-                    plot = new SlopeAreaScatterPlot(
+                    plot = new SlopeAreaScatterPlot(env.env,
                             degree,
                             data,
                             executorService,
@@ -166,12 +166,11 @@ public class SlopeAreaAnalysis extends FG_Object {
         pw.close();
     }
 
-    protected TreeMap<Integer, Object[]> readSwissData(File fileIn) {
+    protected TreeMap<Integer, Object[]> readSwissData(File fileIn) throws FileNotFoundException {
         TreeMap<Integer, Object[]> result;
         result = new TreeMap<>();
         BufferedReader br = env.env.io.getBufferedReader(fileIn);
-        StreamTokenizer st;
-        st = new StreamTokenizer(br);
+        StreamTokenizer st = new StreamTokenizer(br);
         env.env.io.setStreamTokenizerSyntax5(st);
         st.wordChars('(', '(');
         st.wordChars(')', ')');
@@ -201,7 +200,7 @@ public class SlopeAreaAnalysis extends FG_Object {
                             BigDecimal minx;
                             BigDecimal miny;
                             data = result.get(ID);
-                            ArrayList<Data_BiNumeric> theGeneric_XYNumericalData;
+                            ArrayList<Data_BiBigDecimal> theGeneric_XYNumericalData;
                             if (data == null) {
                                 data = new Object[5];
                                 theGeneric_XYNumericalData = new ArrayList<>();
@@ -216,7 +215,7 @@ public class SlopeAreaAnalysis extends FG_Object {
                                 data[4] = miny;
                                 result.put(ID, data);
                             } else {
-                                theGeneric_XYNumericalData = (ArrayList<Data_BiNumeric>) data[0];
+                                theGeneric_XYNumericalData = (ArrayList<Data_BiBigDecimal>) data[0];
                                 maxx = (BigDecimal) data[1];
                                 minx = (BigDecimal) data[2];
                                 maxy = (BigDecimal) data[3];
@@ -236,8 +235,8 @@ public class SlopeAreaAnalysis extends FG_Object {
                             } else {
                                 slope = BigDecimal.ZERO;
                             }
-                            Data_BiNumeric point;
-                            point = new Data_BiNumeric(slope, area);
+                            Data_BiBigDecimal point;
+                            point = new Data_BiBigDecimal(slope, area);
                             theGeneric_XYNumericalData.add(point);
                             data[0] = theGeneric_XYNumericalData;
                             data[1] = maxx.max(slope);
@@ -258,13 +257,10 @@ public class SlopeAreaAnalysis extends FG_Object {
         return result;
     }
 
-    protected TreeMap<Integer, Object[]> readAustriaData(File fileIn) {
-        TreeMap<Integer, Object[]> result;
-        result = new TreeMap<>();
-        BufferedReader br;
-        br = env.env.io.getBufferedReader(fileIn);
-        StreamTokenizer st;
-        st = new StreamTokenizer(br);
+    protected TreeMap<Integer, Object[]> readAustriaData(File fileIn) throws FileNotFoundException {
+        TreeMap<Integer, Object[]> r = new TreeMap<>();
+        BufferedReader br = env.env.io.getBufferedReader(fileIn);
+        StreamTokenizer st = new StreamTokenizer(br);
         env.env.io.setStreamTokenizerSyntax5(st);
         st.wordChars('(', '(');
         st.wordChars(')', ')');
@@ -293,8 +289,8 @@ public class SlopeAreaAnalysis extends FG_Object {
                             BigDecimal maxy;
                             BigDecimal minx;
                             BigDecimal miny;
-                            data = result.get(ID);
-                            ArrayList<Data_BiNumeric> theGeneric_XYNumericalData;
+                            data = r.get(ID);
+                            ArrayList<Data_BiBigDecimal> theGeneric_XYNumericalData;
                             if (data == null) {
                                 data = new Object[5];
                                 theGeneric_XYNumericalData = new ArrayList<>();
@@ -307,9 +303,9 @@ public class SlopeAreaAnalysis extends FG_Object {
                                 data[2] = minx;
                                 data[3] = maxy;
                                 data[4] = miny;
-                                result.put(ID, data);
+                                r.put(ID, data);
                             } else {
-                                theGeneric_XYNumericalData = (ArrayList<Data_BiNumeric>) data[0];
+                                theGeneric_XYNumericalData = (ArrayList<Data_BiBigDecimal>) data[0];
                                 maxx = (BigDecimal) data[1];
                                 minx = (BigDecimal) data[2];
                                 maxy = (BigDecimal) data[3];
@@ -329,8 +325,8 @@ public class SlopeAreaAnalysis extends FG_Object {
                             } else {
                                 slope = BigDecimal.ZERO;
                             }
-                            Data_BiNumeric point;
-                            point = new Data_BiNumeric(slope, area);
+                            Data_BiBigDecimal point;
+                            point = new Data_BiBigDecimal(slope, area);
                             theGeneric_XYNumericalData.add(point);
                             data[0] = theGeneric_XYNumericalData;
                             data[1] = maxx.max(slope);
@@ -348,7 +344,7 @@ public class SlopeAreaAnalysis extends FG_Object {
         } catch (IOException ex) {
             Logger.getLogger(SlopeAreaAnalysis.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return result;
+        return r;
     }
 
     public void PrintDataSummary(TreeMap<Integer, Object[]> allData) {
@@ -356,8 +352,8 @@ public class SlopeAreaAnalysis extends FG_Object {
         ite = allData.keySet().iterator();
         int ID;
         Object[] data;
-        ArrayList<Data_BiNumeric> theGeneric_XYNumericalData;
-        Data_BiNumeric point;
+        ArrayList<Data_BiBigDecimal> theGeneric_XYNumericalData;
+        Data_BiBigDecimal point;
         BigDecimal maxx;
         BigDecimal minx;
         BigDecimal maxy;
@@ -366,7 +362,7 @@ public class SlopeAreaAnalysis extends FG_Object {
         while (ite.hasNext()) {
             ID = ite.next();
             data = allData.get(ID);
-            theGeneric_XYNumericalData = (ArrayList<Data_BiNumeric>) data[0];
+            theGeneric_XYNumericalData = (ArrayList<Data_BiBigDecimal>) data[0];
             maxx = (BigDecimal) data[1];
             minx = (BigDecimal) data[2];
             maxy = (BigDecimal) data[3];
